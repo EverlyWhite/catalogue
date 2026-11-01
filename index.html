@@ -537,13 +537,16 @@ function showSlip(){
       <label>WhatsApp / Phone *<input name="phone" required type="tel" autocomplete="tel" minlength="8"></label>
       <label>Instagram handle<input name="instagram" placeholder="@" autocapitalize="off"></label>
       <label>Email<input name="email" type="email" autocomplete="email" placeholder="for your confirmation"></label>
-      <label class="w">Delivery address, with city<textarea name="address" rows="3" autocomplete="street-address" placeholder="House, street, area, city, PIN code"></textarea></label>
+      <label class="w">Delivery address *<textarea name="address" rows="3" required autocomplete="street-address" placeholder="House, street, area, city, PIN code"></textarea></label>
       <label class="w">Anything else?<textarea name="notes" rows="2" placeholder="Gifting, a date, a colour you have in mind…"></textarea></label>
-      <div class="cta w" style="grid-column:1/-1"><button class="btn" id="send">Place order · ${inr(slipTotal())}</button></div>
+      <div class="cta w" style="grid-column:1/-1"><button class="btn" id="send" disabled>Place order · ${inr(slipTotal())}</button></div>
     </form>`;
   const form = $('#form');
   for (const [k, v] of Object.entries(draft)) if (form[k]) form[k].value = v;
-  form.oninput = () => draft = Object.fromEntries(new FormData(form));
+  // Place order stays off until name, WhatsApp number and delivery address are all filled in properly.
+  const ready = () => $('#send').disabled = !form.checkValidity() || !form.elements.name.value.trim() || !form.elements.address.value.trim();
+  form.oninput = () => { draft = Object.fromEntries(new FormData(form)); ready() };
+  ready();
   form.instagram.value ||= SRC.ig;
   $('#czOpts').querySelectorAll('[data-d]').forEach(b => b.onclick = () => {
     const x = slip[b.dataset.i]; x.qty = Math.max(1, Math.min(50, x.qty + +b.dataset.d)); saveSlip(); showSlip();
