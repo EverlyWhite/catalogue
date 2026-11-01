@@ -234,6 +234,28 @@ form.f{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
 .ready i{width:7px;height:7px;border-radius:50%;background:var(--sun);animation:breathe 1.6s ease-in-out infinite}
 @keyframes breathe{50%{opacity:.25}}
 .done-acts{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+/* ---------- phones ---------- */
+@media (max-width:640px){
+  /* buttons may wrap: a one-line "Enter the world of Everly White" was 401pt wide, wider than any phone,
+     which made the browser zoom the whole site out */
+  .btn{white-space:normal;text-align:center;line-height:1.35;padding:12px 20px;letter-spacing:.14em}
+  /* small caps labels a phone can actually read */
+  .lbl,.f label,.pick label,.slip-total,.cta .total small{font-size:12px}
+  .qty.sm button{width:44px;height:44px}
+  .lbl{letter-spacing:.14em}
+  /* header: logo, then two equal tabs with room to breathe — the tabs used to squeeze and overlap */
+  .bar{padding:8px 16px 0;gap:2px}
+  .bar .logo{height:24px}
+  .tabs{width:100%;gap:0}
+  .tabs button{flex:1;min-height:46px;padding:6px 6px 12px;font-size:11px;letter-spacing:.1em;line-height:1.35;white-space:normal}
+  .tabs button:after{left:18%;right:18%;bottom:3px}
+  .tabs .new{display:inline-block;font-size:8px;letter-spacing:.12em;padding:2px 5px;margin-left:5px;vertical-align:1px;line-height:1.2}
+  /* less empty space between the header line and the first content */
+  .intro-band{padding:26px 0 4px}
+  .intro-band .lbl{letter-spacing:.08em}
+  .intro-band h1{margin:10px 0 4px}
+  .orn{margin-bottom:14px}
+}
 @media (prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;transition:none!important}}
 </style>
 </head>
