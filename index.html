@@ -30,6 +30,7 @@ button{cursor:pointer;border:0;background:none}
 .btn.ghost{background:transparent;color:var(--brown)}
 .btn.ghost:hover{background:var(--brown);color:var(--paper)}
 .btn[disabled]{opacity:.4;pointer-events:none}
+.btn.off,.btn.off:hover{background:#C9A9A5;border-color:#C9A9A5;color:var(--paper)}
 .view{display:none}.view.on{display:block;animation:fade .6s var(--ease)}
 @keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 
@@ -136,8 +137,12 @@ dialog::backdrop{background:rgba(30,30,30,.4);backdrop-filter:blur(3px)}
 .cz .desc{color:var(--body);font-size:16.5px;margin:10px 0 6px}
 .swc{display:inline-flex;align-items:center;gap:10px}
 .swc i{width:22px;height:22px;border-radius:50%;border:1px solid rgba(0,0,0,.12)}
-.cta{position:sticky;bottom:0;z-index:2;background:var(--paper);display:flex;align-items:center;gap:14px;padding:14px 0 calc(14px + env(safe-area-inset-bottom));margin-top:10px;border-top:1px solid var(--line)}
+.cta{position:sticky;bottom:0;z-index:2;background:var(--paper);display:flex;flex-wrap:wrap;align-items:center;gap:14px;padding:14px 0 calc(14px + env(safe-area-inset-bottom));margin-top:10px;border-top:1px solid var(--line)}
 .cta .btn{flex:1}
+.cta .formmsg:empty{display:none}
+.cta .formmsg{flex-basis:100%;margin:0 0 -4px;color:#A3482B;font-size:16px;line-height:1.35}
+.f [aria-invalid=true]{border-color:#A3482B;background:#FFF6F4}
+#done .msg .next{display:block;margin-top:12px;font-style:italic;color:var(--mute)}
 .cta .total{display:flex;flex-direction:column;line-height:1.1;margin-left:4px}
 .cta .total small{font:400 10px/1.4 var(--head);letter-spacing:.16em;text-transform:uppercase;color:var(--mute)}
 .cta .total b{font:400 19px/1.2 var(--head);color:var(--brown);font-weight:400;white-space:nowrap}
@@ -532,21 +537,27 @@ function showSlip(){
       <span class="lp">${inr(x.unit * x.qty)}</span></li>`).join('')}</ol>
     <div class="slip-total"><span>Total</span><b>${inr(slipTotal())}</b></div>
     <button class="btn ghost more" id="more">＋ Add another candle</button>
-    <form class="f" id="form">
+    <form class="f" id="form" novalidate>
       <label>Name *<input name="name" required autocomplete="name"></label>
       <label>WhatsApp / Phone *<input name="phone" required type="tel" autocomplete="tel" minlength="8"></label>
       <label>Instagram handle<input name="instagram" placeholder="@" autocapitalize="off"></label>
       <label>Email<input name="email" type="email" autocomplete="email" placeholder="for your confirmation"></label>
       <label class="w">Delivery address *<textarea name="address" rows="3" required autocomplete="street-address" placeholder="House, street, area, city, PIN code"></textarea></label>
       <label class="w">Anything else?<textarea name="notes" rows="2" placeholder="Gifting, a date, a colour you have in mind…"></textarea></label>
-      <div class="cta w" style="grid-column:1/-1"><button class="btn" id="send" disabled>Place order · ${inr(slipTotal())}</button></div>
+      <div class="cta w" style="grid-column:1/-1"><p class="formmsg" id="formMsg" role="alert"></p><button class="btn off" id="send" aria-disabled="true">Place order · ${inr(slipTotal())}</button></div>
     </form>`;
   const form = $('#form');
   for (const [k, v] of Object.entries(draft)) if (form[k]) form[k].value = v;
-  // Place order stays off until name, WhatsApp number and delivery address are all filled in properly.
-  const ready = () => $('#send').disabled = !form.checkValidity() || !form.elements.name.value.trim() || !form.elements.address.value.trim();
-  form.oninput = () => { draft = Object.fromEntries(new FormData(form)); ready() };
-  ready();
+  // Place order looks off (light brown) until name, WhatsApp number and delivery address are filled in.
+  // It stays tappable: a tap on an incomplete form says what's missing instead of doing nothing.
+  form.oninput = () => {
+    draft = Object.fromEntries(new FormData(form));
+    const ok = !missing(form).length;
+    $('#send').classList.toggle('off', !ok); $('#send').setAttribute('aria-disabled', !ok);
+    form.querySelectorAll('[aria-invalid=true]').forEach(el => isFilled(el) && el.removeAttribute('aria-invalid'));
+    if (ok) $('#formMsg').textContent = '';
+  };
+  form.oninput();
   form.instagram.value ||= SRC.ig;
   $('#czOpts').querySelectorAll('[data-d]').forEach(b => b.onclick = () => {
     const x = slip[b.dataset.i]; x.qty = Math.max(1, Math.min(50, x.qty + +b.dataset.d)); saveSlip(); showSlip();
@@ -574,8 +585,19 @@ async function flush(){
 }
 addEventListener('online', flush);
 
+// The three things an order can't go without. A phone number needs at least 8 digits.
+const isFilled = el => el.name === 'phone' ? el.value.replace(/\D/g, '').length >= 8 : !!el.value.trim();
+const missing = form => ['name', 'phone', 'address'].map(n => form.elements[n]).filter(el => !isFilled(el));
+
 async function send(e){
   e.preventDefault();
+  const gaps = missing(e.target);
+  if (gaps.length) {
+    gaps.forEach(el => el.setAttribute('aria-invalid', 'true'));
+    $('#formMsg').textContent = 'Please fill in your name, WhatsApp number and delivery address to place your order.';
+    gaps[0].focus();
+    return;
+  }
   const f = Object.fromEntries(new FormData(e.target)), d = new Date();
   const req = {
     id: 'EW-' + d.toISOString().slice(2,10).replace(/-/g,'') + '-' + Math.random().toString(36).slice(2,6).toUpperCase(),
@@ -589,7 +611,7 @@ async function send(e){
   await flush();
   cz.close();
   $('#doneTitle').textContent = `Thank you, ${f.name.trim().split(' ')[0]}`;
-  $('#doneMsg').innerHTML = `Your order <b>${req.id}</b> is placed. Our studio will message you ${f.instagram ? 'on Instagram' : 'on WhatsApp'} shortly to confirm it and share payment and delivery details, and then it will be lovingly prepared.`;
+  $('#doneMsg').innerHTML = `We have received your order <b>${req.id}</b>, and we’ll get in touch with you on WhatsApp shortly.<span class="next">Next, we’ll send you a QR code for a small token amount. Once it’s paid, we start making your order.</span>`;
   $('#doneCard').innerHTML = `${pic}<div><b>${plural(pieces())} · ${inr(slipTotal())}</b>${slip.map(x => `<small>${esc(x.name)}${x.qty > 1 ? ' × ' + x.qty : ''} — ${esc(x.details)}</small>`).join('')}</div>`;
   $('#wa').href = CONFIG.WHATSAPP;
   $('#done').classList.add('on');
