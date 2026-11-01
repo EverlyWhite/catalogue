@@ -217,19 +217,29 @@ form.f{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
 /* ---------- confirmation ---------- */
 #done{position:fixed;inset:0;z-index:50;background:var(--paper);display:none;overflow:auto;text-align:center;padding:calc(40px + env(safe-area-inset-top)) 22px 40px}
 #done.on{display:block;animation:fade .8s var(--ease)}
-.glow{width:120px;height:150px;margin:10px auto 6px}
-.glow svg{width:100%;height:100%;overflow:visible}
-.glow .fl{transform-origin:60px 58px;animation:light 1.4s .4s var(--ease) both,flicker 2.6s 1.8s ease-in-out infinite}
-.glow .halo{animation:halo 2s .8s ease-out both}
-@keyframes light{from{transform:scale(0);opacity:0}}
-@keyframes flicker{50%{transform:scale(.94,1.05) skewX(-2deg)}}
-@keyframes halo{from{opacity:0}}
+#confetti{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:1}
+#done>*{position:relative;z-index:2}#done>#confetti{position:fixed;z-index:3}
+#done{padding-top:calc(64px + env(safe-area-inset-top))}
 #done h2{font:300 clamp(30px,5vw,44px)/1.1 var(--head);margin:8px 0 10px}
 #done .msg{max-width:31em;margin:0 auto;color:var(--body)}
-#done .card{max-width:560px;margin:26px auto;display:grid;grid-template-columns:120px 1fr;gap:16px;text-align:left;background:var(--pink);padding:14px;animation:fade .6s 1s var(--ease) both}
-#done .card>:first-child{width:120px;height:120px;object-fit:cover;overflow:hidden}
-#done .card b{font:400 18px/1.2 var(--head);display:block;margin-bottom:4px}
-#done .card small{color:var(--mute);font-size:15.5px;line-height:1.4;display:block}
+/* what was ordered: one swipeable card per piece */
+.ordered{max-width:560px;margin:28px auto 26px;animation:fade .6s .9s var(--ease) both}
+.ordered-head{font:400 13px/1 var(--head);letter-spacing:.16em;text-transform:uppercase;color:var(--brown);margin-bottom:12px}
+.car{display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;scrollbar-width:none;text-align:left}
+.car::-webkit-scrollbar{display:none}
+.slide{flex:0 0 100%;scroll-snap-align:center;display:grid;grid-template-columns:132px minmax(0,1fr);gap:16px;align-items:center;background:var(--pink);padding:14px}
+.car.many .slide{flex-basis:88%}
+.slide .ph{width:132px;height:132px;background:var(--pink2);overflow:hidden}
+.slide .ph>*,.slide .ph img{width:100%;height:100%;object-fit:cover}
+.slide .no{font:400 11px/1 var(--head);letter-spacing:.16em;color:var(--brown)}
+.slide b{display:block;font:400 19px/1.2 var(--head);margin:6px 0 4px}
+.slide small{display:block;color:var(--mute);font-size:15.5px;line-height:1.4}
+.slide .pr{margin-top:8px;font:400 15px/1 var(--head);color:var(--brown)}
+.cdots{display:flex;justify-content:center;margin-top:4px}
+.cdots button{width:36px;height:36px;display:grid;place-items:center}
+.cdots i{width:7px;height:7px;border-radius:50%;background:var(--pink3);opacity:.5;transition:all .3s}
+.cdots i.on{opacity:1;background:var(--brown);width:20px;border-radius:4px}
+@media (max-width:480px){.slide{grid-template-columns:96px minmax(0,1fr);gap:12px}.slide .ph{width:96px;height:96px}.slide b{font-size:17px}}
 .ready{display:inline-flex;align-items:center;gap:10px;margin-top:6px;font:400 11px/1 var(--head);letter-spacing:.2em;text-transform:uppercase;color:var(--brown)}
 .ready i{width:7px;height:7px;border-radius:50%;background:var(--sun);animation:breathe 1.6s ease-in-out infinite}
 @keyframes breathe{50%{opacity:.25}}
@@ -316,17 +326,15 @@ form.f{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
 
 <!-- confirmation -->
 <section id="done">
-  <div class="glow"><svg viewBox="0 0 120 150">
-    <circle class="halo" cx="60" cy="50" r="46" fill="#FCD7DD" opacity=".55"/>
-    <path class="fl" d="M60 22c9 12 13 20 13 27a13 13 0 0 1-26 0c0-7 4-15 13-27z" fill="#EE8A4E"/>
-    <path class="fl" d="M60 38c4 6 6 10 6 13a6 6 0 0 1-12 0c0-3 2-7 6-13z" fill="#FBE3B8"/>
-    <path d="M60 58v8" stroke="#1E1E1E" stroke-width="2"/>
-    <rect x="34" y="66" width="52" height="78" fill="#FEEAEB" stroke="#EADBD5"/>
-  </svg></div>
+  <canvas id="confetti" aria-hidden="true"></canvas>
   <div class="ready"><i></i>Order received</div>
   <h2 id="doneTitle">Thank you</h2>
   <p class="msg" id="doneMsg"></p>
-  <div class="card" id="doneCard"></div>
+  <div class="ordered">
+    <div class="ordered-head" id="doneHead"></div>
+    <div class="car" id="doneCar" aria-label="What you ordered"></div>
+    <div class="cdots" id="doneDots"></div>
+  </div>
   <div class="done-acts">
     <a class="btn ghost" id="wa" target="_blank" rel="noopener">Message us on WhatsApp</a>
     <button class="btn" onclick="finish()">Explore more</button>
@@ -629,16 +637,65 @@ async function send(e){
   };
   store.set('ew-outbox', [...store.get('ew-outbox', []), req]);
   $('#send').disabled = true;
-  const pic = $('#czBody .pv').firstElementChild.outerHTML;
   await flush();
   cz.close();
   $('#doneTitle').textContent = `Thank you, ${f.name.trim().split(' ')[0]}`;
   $('#doneMsg').innerHTML = `We have received your order <b>${req.id}</b>, and we’ll get in touch with you on WhatsApp shortly.<span class="next">Next, we’ll send you a QR code for a small token amount. Once it’s paid, we start making your order.</span>`;
-  $('#doneCard').innerHTML = `${pic}<div><b>${plural(pieces())} · ${inr(slipTotal())}</b>${slip.map(x => `<small>${esc(x.name)}${x.qty > 1 ? ' × ' + x.qty : ''} — ${esc(x.details)}</small>`).join('')}</div>`;
+  showOrdered(slip);
   $('#wa').href = CONFIG.WHATSAPP;
-  $('#done').classList.add('on');
+  $('#done').classList.add('on'); $('#done').scrollTop = 0;
+  confetti();
   slip = []; saveSlip(); draft = {};
 }
+// One card per piece, swipeable, each with its own photo (a candle in the colour chosen, a pair as photographed).
+function showOrdered(items){
+  const total = items.reduce((a, x) => a + x.unit * x.qty, 0), n = items.reduce((a, x) => a + x.qty, 0);
+  $('#doneHead').textContent = `${plural(n)} · ${inr(total)}`;
+  const car = $('#doneCar'), dots = $('#doneDots');
+  car.classList.toggle('many', items.length > 1);
+  car.innerHTML = items.map((x, i) => `<div class="slide"><div class="ph"></div><div>
+    <div class="no">${items.length > 1 ? `${i + 1} of ${items.length}` : 'Your piece'}</div>
+    <b>${esc(x.name)}${x.qty > 1 ? ' × ' + x.qty : ''}</b><small>${esc(x.details)}</small><div class="pr">${inr(x.unit * x.qty)}</div></div></div>`).join('');
+  car.querySelectorAll('.ph').forEach((ph, i) => {
+    const x = items[i];
+    if (x.kind === 'pair') { const p = PAIRS.find(p => p.id === x.ref); ph.innerHTML = p ? `<img src="assets/${p.im[0]}.webp" alt="">` : '' }
+    else { const c = CANDLES.find(c => c.id === x.ref); if (c) show(ph, c, x.opts?.hex) }
+  });
+  // Dots are buttons too, so a mouse (which can't swipe) can move between pieces.
+  dots.innerHTML = items.length > 1 ? items.map((_, i) => `<button aria-label="Piece ${i + 1}"><i class="${i ? '' : 'on'}"></i></button>`).join('') : '';
+  dots.querySelectorAll('button').forEach((d, i) => d.onclick = () => car.scrollTo({left: car.children[i].offsetLeft - car.offsetLeft, behavior: 'smooth'}));
+  car.scrollLeft = 0;
+  car.onscroll = () => { const i = Math.round(car.scrollLeft / (car.firstElementChild.offsetWidth + 12)); dots.querySelectorAll('i').forEach((d, k) => d.classList.toggle('on', k === i)) };
+}
+
+// A celebration: three bursts of confetti in the brand's colours. Skipped for anyone who has reduce-motion on.
+function confetti(){
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const cv = $('#confetti'), x = cv.getContext('2d'), dpr = devicePixelRatio || 1;
+  const W = cv.width = innerWidth * dpr, H = cv.height = innerHeight * dpr;
+  const colors = ['#8C4646', '#F3ACB4', '#FCD7DD', '#EE8A4E', '#D9B26F', '#9D5B52', '#FFFFFF'];
+  const bits = [];
+  const burst = (ox, oy, dir, count) => { for (let i = 0; i < count; i++) {
+    const a = dir + (Math.random() - .5) * 1.1, v = (9 + Math.random() * 11) * dpr;
+    bits.push({x: ox, y: oy, vx: Math.cos(a) * v, vy: Math.sin(a) * v, w: (6 + Math.random() * 6) * dpr, h: (8 + Math.random() * 10) * dpr,
+      r: Math.random() * 6.28, vr: (Math.random() - .5) * .35, c: colors[i % colors.length], round: Math.random() < .3, life: 0});
+  } };
+  burst(0, H * .75, -1.0, 90); burst(W, H * .75, -2.14, 90);
+  setTimeout(() => burst(W / 2, H * .9, -1.57, 110), 450);
+  setTimeout(() => { burst(0, H * .55, -0.8, 60); burst(W, H * .55, -2.34, 60) }, 1100);
+  const t0 = performance.now();
+  (function frame(t){
+    x.clearRect(0, 0, W, H);
+    for (const b of bits) {
+      b.vy += .32 * dpr; b.vx *= .985; b.vy *= .985; b.x += b.vx; b.y += b.vy; b.r += b.vr; b.life++;
+      x.save(); x.translate(b.x, b.y); x.rotate(b.r); x.fillStyle = b.c; x.globalAlpha = Math.max(0, 1 - (t - t0 - 3200) / 1200);
+      if (b.round) { x.beginPath(); x.arc(0, 0, b.w / 2, 0, 6.28); x.fill() } else x.fillRect(-b.w / 2, -b.h / 2, b.w, b.h * Math.abs(Math.cos(b.life * .12)));
+      x.restore();
+    }
+    if (t - t0 < 4400) requestAnimationFrame(frame); else x.clearRect(0, 0, W, H);
+  })(t0);
+}
+
 function finish(){ $('#done').classList.remove('on'); go('world') }
 
 // rows drift in as they scroll into view
