@@ -102,7 +102,7 @@ main{max-width:1240px;margin:0 auto;padding:0 24px calc(60px + env(safe-area-ins
 .info .acts{margin-top:30px;display:flex;gap:12px}
 .info .acts .btn{flex:1;padding:0 18px}
 @media (max-width:760px){
-  .row{grid-template-columns:1fr;gap:22px;padding:22px 0 40px}
+  .row{grid-template-columns:minmax(0,1fr);gap:22px;padding:22px 0 40px}
   .row:nth-child(even) .main{order:0}
   .main{aspect-ratio:1}
   .info{max-width:none;text-align:center}
@@ -194,7 +194,10 @@ form.f{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
 .err{grid-column:1/-1;color:#A3482B;font-size:15px}
 @media (max-width:800px){
   dialog{width:100vw;height:100dvh;max-height:none;margin:0}
-  .cz{grid-template-columns:1fr}.cz .pv{position:relative;aspect-ratio:auto;height:44dvh}
+  .cz{grid-template-columns:minmax(0,1fr)}.cz .pv{position:relative;aspect-ratio:auto;height:34dvh;min-height:0}
+  /* on a phone the slip is a list to read, not a picture to look at: drop the photo, keep the close button clear */
+  .cz.slipping .pv{display:none}.cz.slipping .opts-col{padding-top:60px}
+  .cta{gap:10px}.cta .btn{padding:0 16px}.cta .qty button{width:42px}
   .cz .opts-col{padding:22px 18px 0}.cz h2{font-size:28px}
   .two,form.f{grid-template-columns:1fr}
   #photos .strip>*{max-height:none;height:calc(100dvh - 44px)}
@@ -469,6 +472,7 @@ const pieces = () => slip.reduce((a, x) => a + x.qty, 0);
 const plural = n => `${n} piece${n === 1 ? '' : 's'}`;
 
 function openSheet(pvHTML){
+  $('#czBody').classList.remove('slipping');
   $('#czBody').innerHTML = `<div class="pv">${pvHTML}<span class="sw-name"></span></div><div class="opts-col" id="czOpts"></div>`;
   if (!cz.open) cz.showModal();
 }
@@ -519,6 +523,7 @@ function orderPair(p){
 
 function showSlip(){
   if (!slip.length) { cz.close(); return }
+  $('#czBody').classList.add('slipping'); cz.scrollTop = 0;
   $('#czOpts').innerHTML = `<div class="lbl">Your order slip</div><h2>${plural(pieces())}</h2>
     <ol class="slip">${slip.map((x, i) => `<li><span class="no">${String(i + 1).padStart(2, '0')}</span>
       <div class="ln"><b>${esc(x.name)}</b><small>${esc(x.details)}</small>
