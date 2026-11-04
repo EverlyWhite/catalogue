@@ -172,6 +172,7 @@ dialog::backdrop{background:rgba(30,30,30,.4);backdrop-filter:blur(3px)}
 /* the photo is never cropped: a square frame for square product shots, and contain for anything else */
 .cz .pv{background:var(--pink);position:sticky;top:0;align-self:start;aspect-ratio:1;max-height:94dvh}
 .cz .pv>*,.cz .pv .slot>*{width:100%;height:100%;object-fit:contain}
+.cz .pv .sw-name:empty{display:none}
 .cz .pv .sw-name{position:absolute;left:14px;bottom:14px;width:auto;height:auto;background:rgba(255,249,245,.9);padding:6px 12px;font:italic 15px/1 var(--text);color:var(--mute)}
 .cz .opts-col{padding:34px 32px 30px}
 .cz h2{font:300 32px/1.1 var(--head);margin:6px 0 4px}
@@ -640,9 +641,10 @@ function addPair(p, btn){
   btn.textContent = 'Added ✓'; btn.classList.add('added');
   setTimeout(() => { btn.textContent = 'Add to cart'; btn.classList.remove('added') }, 1600);
 }
+// The cart shows the first piece in it (a pair or a candle); an empty cart shows the gift box.
 function openCart(){
-  const x = slip[0], p = x && PAIRS.find(p => p.id === x.ref);
-  openSheet(p ? `<img src="assets/${p.im[0]}.webp" alt="">` : '<img src="assets/coll-banner.png" alt="">');
+  const photo = slip.length ? invoiceLine(slip[0]).image : '';
+  openSheet(`<img src="${photo || 'assets/cart.jpg'}" alt="">`);
   showSlip();
 }
 $('#cartBtn').onclick = openCart;
@@ -650,7 +652,7 @@ $('#cartBtn').onclick = openCart;
 function showSlip(){
   $('#czBody').classList.add('slipping'); cz.scrollTop = 0;
   if (!slip.length) {
-    $('#czOpts').innerHTML = `<div class="lbl">Your cart</div><h2>Your cart is empty</h2><p class="desc">Add a pair from the collection and it will wait for you here.</p>
+    $('#czOpts').innerHTML = `<div class="lbl">Your cart</div><h2>Your cart is empty</h2><p class="desc">Add a piece from the collection and it will wait for you here.</p>
       <button class="btn more" onclick="cz.close()">Browse the collection</button>`;
     return;
   }
