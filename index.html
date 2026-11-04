@@ -444,15 +444,15 @@ const CANDLES = [
 ];
 
 const PAIRS = [
-  {id:'EW-01', name:'Twin Flames', tag:'One soul, two bodies.', price:8801, im:['tf-1','tf-2'], motif:'Mandala with diamond inlay',
+  {id:'EW-01', name:'Twin Flames', tag:'One soul, two bodies.', price:6801, im:['tf-1','tf-2','tf-3'], motif:'Mandala with diamond inlay',
    desc:'Two hand-carved plates share one motif that only completes itself when they sit together, a quiet picture of the Divine Masculine and Divine Feminine.'},
-  {id:'EW-02', name:'Lunar Bond', tag:'Forever in orbit.', price:8881, im:['lb-1','lb-2'], motif:'Radiating lunar rings',
+  {id:'EW-02', name:'Lunar Bond', tag:'Forever in orbit.', price:6881, im:['lb-1','lb-2','lb-3'], motif:'Radiating lunar rings',
    desc:'Gentle, intuitive and deeply felt. Carved in a radiating lunar motif, the mirror settles into the surface a little differently on every piece.'},
-  {id:'EW-03', name:'Star Crossed Lovers', tag:'Written in the stars.', price:8101, im:['scl-1','scl-2'], motif:'Eight-point star',
+  {id:'EW-03', name:'Star Crossed Lovers', tag:'Written in the stars.', price:6101, im:['scl-1','scl-2','scl-3'], motif:'Eight-point star',
    desc:'For the meetings that change everything. An eight-point star is carved across both plates and set with mirror by hand.'},
-  {id:'EW-04', name:'Butterfly Effect', tag:'A small flutter.', price:8501, im:['be-1','be-2'], motif:'Floral wings, teardrop mirrors',
+  {id:'EW-04', name:'Butterfly Effect', tag:'A small flutter.', price:6501, im:['be-1','be-2','be-3'], motif:'Floral wings, teardrop mirrors',
    desc:'Even the smallest flutter can shape a lifetime. A floral, wing-like carving spans both plates, petals seeming to move from one to the other.'},
-  {id:'EW-05', name:'String of Fate', tag:'An invisible thread.', price:7501, im:['sof-1','sof-2'], motif:'Fine open lattice',
+  {id:'EW-05', name:'String of Fate', tag:'An invisible thread.', price:6501, im:['sof-1','sof-2','sof-3'], motif:'Fine open lattice',
    desc:'An invisible thread connects those meant to meet. Carved as a fine lattice, a thread of light runs through the whole piece.'},
 ];
 
@@ -573,6 +573,12 @@ let sel;
    Each customised candle (or a pair) becomes a numbered line. The slip lives inside the order sheet and
    is kept on this device, so closing the sheet midway loses nothing. One "Place order" sends it all. */
 let slip = store.get('ew-slip', []);
+// A saved cart always shows today's prices (and drops pieces no longer in the catalogue).
+slip = slip.filter(x => {
+  const p = x.kind === 'pair' && PAIRS.find(p => p.id === x.ref), c = x.kind === 'candle' && CANDLES.find(c => c.id === x.ref);
+  if (p) x.unit = p.price; else if (c) x.unit = c.price[x.opts?.wax] ?? x.unit;
+  return p || c;
+});
 let draft = {};   // the details form, kept while the customer goes off to add or edit a piece
 const saveSlip = () => {
   store.set('ew-slip', slip);
