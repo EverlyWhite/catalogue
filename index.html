@@ -6,6 +6,15 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#FFF9F5">
 <meta name="robots" content="noindex">
+<!-- Only our own files, Google Fonts, the order script and (if switched on in CONFIG) the Meta / Google ad tags may load.
+     If an ad tag is switched on and something of it is blocked, add its address here. -->
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; form-action 'self';
+  script-src 'self' 'unsafe-inline' https://connect.facebook.net https://www.googletagmanager.com;
+  style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com;
+  img-src 'self' data: blob: https://www.facebook.com https://www.googletagmanager.com https://*.google-analytics.com https://*.g.doubleclick.net https://www.google.com https://www.google.co.in;
+  connect-src 'self' https://script.google.com https://script.googleusercontent.com https://www.facebook.com https://*.google-analytics.com https://*.analytics.google.com https://www.googletagmanager.com https://*.g.doubleclick.net">
+<meta name="referrer" content="same-origin">
+<link rel="icon" href="data:,">
 <title>Everly White Showroom</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@300;400;500&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
@@ -30,7 +39,7 @@ button{cursor:pointer;border:0;background:none}
 .btn.ghost{background:transparent;color:var(--brown)}
 .btn.ghost:hover{background:var(--brown);color:var(--paper)}
 .btn[disabled]{opacity:.4;pointer-events:none}
-.btn.off,.btn.off:hover{background:#C9A9A5;border-color:#C9A9A5;color:var(--paper)}
+.btn.off,.btn.off:hover{background:#EBD9D5;border-color:#EBD9D5;color:var(--brown)}
 .view{display:none}.view.on{display:block;animation:fade .6s var(--ease)}
 @keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 
@@ -72,6 +81,7 @@ header{position:sticky;top:0;z-index:20;background:rgba(255,255,255,.6);backdrop
 @keyframes pulse{40%{transform:scale(1.12)}}
 .btn.added{background:var(--ink);border-color:var(--ink)}
 .bar .logo{height:32px;cursor:pointer}
+.logo-btn{display:flex;align-items:center;padding:0}
 .tabs{display:flex;gap:40px}
 .tabs button{position:relative;min-height:48px;padding:0 2px;font:400 12.5px/1 var(--head);letter-spacing:.22em;text-transform:uppercase;color:var(--soft);transition:color .4s}
 .tabs button:after{content:"";position:absolute;left:0;right:0;bottom:8px;height:1px;background:var(--brown);transform:scaleX(0);transition:transform .6s var(--ease)}
@@ -282,6 +292,8 @@ form.f{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
 .err{grid-column:1/-1;color:#A3482B;font-size:15px}
 .f label.consent{grid-column:1/-1;flex-direction:row;align-items:flex-start;gap:12px;font:400 16px/1.4 var(--text);letter-spacing:0;text-transform:none;color:var(--body);cursor:pointer}
 .f label.consent input{min-height:0;width:20px;height:20px;margin-top:1px;flex:none;accent-color:var(--brown)}
+.f .privacy{grid-column:1/-1;font-size:14.5px;line-height:1.45;color:var(--mute)}
+.f .hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
 @media (max-width:800px){
   dialog{width:100vw;height:100dvh;max-height:none;margin:0}
   .cz{grid-template-columns:minmax(0,1fr)}.cz .pv{position:relative;width:100%;aspect-ratio:1;max-height:56dvh;justify-self:center}
@@ -412,7 +424,7 @@ form.f{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
 <!-- ============ WORLD ============ -->
 <section id="world" class="view">
   <header><div class="bar">
-    <img class="logo" src="assets/logo.png" alt="Everly White" onclick="go('home')">
+    <button class="logo-btn" onclick="go('home')" aria-label="Everly White, back to the start"><img class="logo" src="assets/logo.png" alt=""></button>
     <nav class="cats" role="tablist" aria-label="Collections">
       <button role="tab" aria-selected="true" data-tab="cotu">Centerpieces</button>
       <button role="tab" aria-selected="false" data-tab="mystic">Exotic Candles</button>
@@ -452,7 +464,7 @@ form.f{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
   <canvas id="confetti" aria-hidden="true"></canvas>
   <svg class="seal" viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="29"/><path d="M20 33l8 8 16-17"/></svg>
   <div class="ready"><i></i>Order received</div>
-  <h2 id="doneTitle">Thank you</h2>
+  <h2 id="doneTitle" tabindex="-1">Thank you</h2>
   <p class="msg" id="doneMsg"></p>
   <ol class="steps" aria-label="What happens next">
     <li class="ok"><i></i><b>Order received</b><small>Saved with us</small></li>
@@ -476,13 +488,23 @@ form.f{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
 // Links can say where the customer came from and who they are, e.g.
 // showroom.html?src=reel-candle-launch&ig=ananya#mystic   (ManyChat can fill ig automatically)
 const Q = new URLSearchParams(location.search);
-const SRC = {source: Q.get('src') || 'direct', ig: (Q.get('ig') || '').replace(/^@?/, '@').replace(/^@$/, '')};
+const SRC = {source: (Q.get('src') || 'direct').replace(/[^\w-]/g, '').slice(0, 40) || 'direct', ig: (Q.get('ig') || '').replace(/[^\w.]/g, '').slice(0, 30).replace(/^(?=.)/, '@')};
+// The shop iPad: open the page once with ?kiosk=1 and it stays in kiosk mode (?kiosk=0 turns it off). In kiosk mode
+// nothing a customer typed outlives them: 2 idle minutes and the page starts fresh for the next person.
+try { if (Q.has('kiosk')) localStorage.setItem('ew-kiosk', Q.get('kiosk') === '1' ? '1' : '') } catch {}
+const KIOSK = (() => { try { return localStorage.getItem('ew-kiosk') === '1' } catch { return false } })();
+// The Instagram handle and the kiosk switch are read once, then taken out of the address bar,
+// so they aren't shared onward, bookmarked or passed to an ad tag.
+if (Q.has('ig') || Q.has('kiosk')) { Q.delete('ig'); Q.delete('kiosk'); history.replaceState(null, '', location.pathname + (String(Q) ? '?' + Q : '') + location.hash) }
+// Never shown inside another site's frame (GitHub Pages can't send the header that would forbid it).
+if (top !== self) { document.documentElement.hidden = true; try { top.location = location.href } catch {} }
 
 const CONFIG = {
   // Paste the Web App URL from orders.gs (Google Apps Script) here. Until then enquiries stay saved on this device and are sent once it's set.
   SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbyFSoqFth9Zp9N5SXkOtifsYsIrwQy-Sp6Ytkt_apSyj7ineKqV0hGJuXHzzn9vOCc6BQ/exec',
   WHATSAPP: 'https://wa.me/message/OEJJOG6DF762J1',
   // Ad audiences: paste your IDs to switch these on. Left blank, nothing loads.
+  // Before switching them on, add a cookie / tracking consent step (India's DPDP Act): they track every visitor.
   META_PIXEL_ID: '',     // Meta Events Manager → Data sources → your Pixel ID (digits)
   GOOGLE_TAG_ID: '',     // Google Ads → Tools → Google tag, e.g. AW-123456789 (or a G-… Analytics ID)
 };
@@ -536,6 +558,32 @@ const PAIRS = [
   {id:'EW-05', name:'String of Fate', tag:'An invisible thread.', price:6501, im:['sof-1','sof-2','sof-3','sof-4','sof-5'], motif:'Fine open lattice',
    desc:'An invisible thread connects those meant to meet. Carved as a fine lattice, a thread of light runs through the whole piece.'},
 ];
+// Centerpieces sell as the pair, or either plate on its own. Every option comes with its stand.
+const PIECES = [
+  {id:'pair',   name:'The Pair',     size:'Male Ø 31 cm + Female Ø 21 cm', inc:'2 gold stands, 2 brand cards & gift box'},
+  {id:'male',   name:'Male piece',   size:'The larger plate · Ø 31 cm',    inc:'Gold stand & brand card'},
+  {id:'female', name:'Female piece', size:'The smaller plate · Ø 21 cm',   inc:'Gold stand & brand card'},
+];
+// PRICES above (SETS, sets:{…}, PAIRS price, PIECES) must match the catalogue in orders.gs, which prices the invoice.
+
+// One cart line, always built from the catalogue: today's name, price and wording, a whole quantity from 1 to 50.
+// Returns null for anything that isn't (or is no longer) in the catalogue.
+function makeLine(kind, ref, opts, qty){
+  opts = opts && typeof opts === 'object' ? opts : {};
+  qty = Math.min(50, Math.max(1, Math.floor(Number(qty)) || 1));
+  if (kind === 'candle') {
+    const c = CANDLES.find(c => c.id === ref); if (!c) return null;
+    const set = (c.sets || SETS)[opts.set] ? +opts.set : firstSet(c), frag = FRAGS.includes(opts.frag) ? opts.frag : FRAGS[0];
+    return {kind, ref, name:`${c.name} candle`, unit:setPrice(c, set), qty, details:`Set of ${set} · ${WAX[0].name} · ${COLORS[0][0]} · ${frag}`,
+      opts:{set, wax:WAX[0].id, hex:COLORS[0][1], frag}};
+  }
+  if (kind === 'pair') {
+    const p = PAIRS.find(p => p.id === ref); if (!p) return null;
+    const pc = pieceOf(opts.piece);
+    return {kind, ref, name: pc.id === 'pair' ? p.name : `${p.name} · ${pc.name}`, unit:piecePrice(p, pc.id), qty, details:`${pc.size} · ${pc.inc}`, opts:{piece:pc.id}};
+  }
+  return null;
+}
 
 /* ===== helpers ===== */
 const $ = s => document.querySelector(s);
@@ -545,7 +593,10 @@ const store = {
   get(k, d){ try{ return JSON.parse(localStorage.getItem(k)) ?? d }catch{ return d } },
   set(k, v){ try{ localStorage.setItem(k, JSON.stringify(v)) }catch{} },
 };
-function go(v){ document.querySelectorAll('.view').forEach(e => e.classList.toggle('on', e.id === v)); scrollTo(0,0) }
+function go(v){
+  document.querySelectorAll('.view').forEach(e => e.classList.toggle('on', e.id === v)); scrollTo(0,0);
+  if (v === 'home' && location.hash) history.replaceState(null, '', location.pathname + location.search);
+}
 // Banner words for each category; the text fades across when the tab changes.
 const BANNER = {
   statement: ['Coming Soon', 'Statement Pieces', 'One-of-a-kind pieces, made to be the first thing anyone notices.'],
@@ -558,6 +609,8 @@ function tab(t){
     bt.classList.add('swap');
     setTimeout(() => { bt.querySelector('.lbl').textContent = l; bt.querySelector('h1').textContent = h; bt.querySelector('p').textContent = p; bt.classList.remove('swap') }, 350);
   }
+  // the address bar names the tab, so a copied link opens on it (…/catalogue/#mystic, or the …/catalogue/candles/ link)
+  if (location.hash !== '#' + t) history.replaceState(null, '', location.pathname + location.search + '#' + t);
   document.querySelectorAll('[data-tab]').forEach(x => x.setAttribute('aria-selected', x.dataset.tab === t));
   document.querySelectorAll('.panel').forEach(p => p.classList.toggle('on', p.id === 'p-' + t));
   const top = $('.shop').getBoundingClientRect().top + scrollY - (parseInt(getComputedStyle(document.documentElement).getPropertyValue('--hh')) || 0) - 8;
@@ -599,7 +652,7 @@ const SOON = `<div class="soon"><svg viewBox="0 0 40 64" fill="none" stroke="cur
 // Puts candle c, recoloured to hex (or as photographed), into element el.
 async function show(el, c, hex){
   let img = el.querySelector('img');
-  if (!img) { el.innerHTML = '<img alt="" loading="lazy" decoding="async">'; img = el.querySelector('img'); img.onerror = () => { el.innerHTML = SOON }; img.src = c.photo }
+  if (!img) { el.innerHTML = `<img alt="${esc(c.name)} candles" loading="lazy" decoding="async">`; img = el.querySelector('img'); img.onerror = () => { el.innerHTML = SOON }; img.src = c.photo }
   if (!hex || !c.mask) { img.src = c.photo; return }
   try { const url = await paint(c, hex); img.style.opacity = .3; img.src = url; img.onload = () => img.style.opacity = 1 } catch { img.src = c.photo }
 }
@@ -654,18 +707,15 @@ let sel;
 /* ===== the order slip: several pieces in one order, written up like an atelier slip — no cart =====
    Each customised candle (or a pair) becomes a numbered line. The slip lives inside the order sheet and
    is kept on this device, so closing the sheet midway loses nothing. One "Place order" sends it all. */
-let slip = store.get('ew-slip', []);
-// A saved cart always shows today's prices (and drops pieces no longer in the catalogue).
-slip = slip.filter(x => {
-  const p = x.kind === 'pair' && PAIRS.find(p => p.id === x.ref), c = x.kind === 'candle' && CANDLES.find(c => c.id === x.ref);
-  if (c && !(c.sets || SETS)[x.opts?.set]) { x.opts = {...x.opts, set:firstSet(c)}; x.details = x.details.replace(/^Set of \d+/, 'Set of ' + firstSet(c)) }
-  if (p) x.unit = piecePrice(p, x.opts?.piece || 'pair'); else if (c) x.unit = setPrice(c, x.opts.set);
-  return p || c;
-});
+// A saved cart is rebuilt line by line from today's catalogue: today's prices and wording, and anything broken,
+// edited by hand or no longer sold is dropped. A bad saved cart must never stop the page from loading.
+const savedCart = store.get('ew-slip', []);
+let slip = (Array.isArray(savedCart) ? savedCart : []).map(x => { try { return x && makeLine(x.kind, x.ref, x.opts, x.qty) } catch { return null } }).filter(Boolean);
 let draft = {};   // the details form, kept while the customer goes off to add or edit a piece
 const saveSlip = () => {
   store.set('ew-slip', slip);
   const n = pieces(); $('#count').textContent = n; $('#count').classList.toggle('on', n > 0);
+  $('#cartBtn').setAttribute('aria-label', n ? `My cart, ${plural(n)}` : 'My cart, empty');
 };
 const slipTotal = () => slip.reduce((a, x) => a + x.unit * x.qty, 0);
 const pieces = () => slip.reduce((a, x) => a + x.qty, 0);
@@ -719,22 +769,14 @@ function renderOpts(){
   $('#czOpts').querySelectorAll('[data-q]').forEach(b => b.onclick = () => { sel.qty = Math.max(1, Math.min(50, sel.qty + +b.dataset.q)); renderOpts() });
   if (slip.length && !editing) $('#toSlip').onclick = showSlip;
   $('#addSlip').onclick = () => {
-    const line = {kind:'candle', ref:c.id, name:`${c.name} candle`, unit:unitPrice(), qty:sel.qty,
-      details:`Set of ${sel.set} · ${WAX.find(w => w.id === sel.wax).name} · ${colorName(sel.hex)} · ${sel.frag}`,
-      opts:{set:sel.set, wax:sel.wax, hex:sel.hex, frag:sel.frag}};
+    const line = makeLine('candle', c.id, {set:sel.set, frag:sel.frag}, sel.qty);
     if (editing) slip[sel.edit] = line; else { slip.push(line); track('AddToCart', {value: line.unit * line.qty, currency: 'INR', content_name: line.name}) }
     saveSlip(); showSlip();
   };
   pv();
 }
-// Centerpieces sell as the pair, or either plate on its own. Every option comes with its stand.
-const PIECES = [
-  {id:'pair',   name:'The Pair',     size:'Male Ø 31 cm + Female Ø 21 cm', inc:'2 gold stands, 2 brand cards & gift box'},
-  {id:'male',   name:'Male piece',   size:'The larger plate · Ø 31 cm',    inc:'Gold stand & brand card'},
-  {id:'female', name:'Female piece', size:'The smaller plate · Ø 21 cm',   inc:'Gold stand & brand card'},
-];
-// ponytail: single-plate prices are placeholders (60% / 45% of the pair) until the real ones are in; set p.prices = {male:…, female:…} to override.
-// (function declarations, not consts: the saved cart is re-priced before this point in the script)
+// ponytail: single-plate prices are placeholders (60% / 45% of the pair) until the real ones are in; set p.prices = {male:…, female:…} to override
+// (and the same in orders.gs, which prices the invoice).
 function piecePrice(p, id){ return p.prices?.[id] ?? (id === 'pair' ? p.price : Math.round(p.price * (id === 'male' ? .6 : .45) / 100) * 100 + 1) }
 function pieceOf(id){ return PIECES.find(x => x.id === id) || PIECES[0] }
 let psel;
@@ -760,16 +802,14 @@ function renderPair(){
   $('#czOpts').querySelectorAll('[data-q]').forEach(b => b.onclick = () => { psel.qty = Math.max(1, Math.min(50, psel.qty + +b.dataset.q)); renderPair() });
   if (slip.length && !editing) $('#toSlip').onclick = showSlip;
   $('#addSlip').onclick = () => {
-    const line = {kind:'pair', ref:p.id, name: psel.piece === 'pair' ? p.name : `${p.name} · ${pc.name}`, unit:piecePrice(p, psel.piece), qty:psel.qty,
-      details:`${pc.size} · ${pc.inc}`, opts:{piece:psel.piece}};
+    const line = makeLine('pair', p.id, {piece:psel.piece}, psel.qty);
     if (editing) slip[psel.edit] = line; else { slip.push(line); track('AddToCart', {value: line.unit * line.qty, currency: 'INR', content_name: line.name}) }
     saveSlip(); showSlip();
   };
 }
 // The cart shows the first piece in it (a pair or a candle); an empty cart shows the gift box.
 function openCart(){
-  const photo = slip.length ? invoiceLine(slip[0]).image : '';
-  openSheet(`<img src="${photo || 'assets/cart.jpg'}" alt="">`);
+  openSheet(`<img src="${(slip.length && photoOf(slip[0])) || 'assets/cart.jpg'}" alt="">`);
   showSlip();
 }
 $('#cartBtn').onclick = openCart;
@@ -808,11 +848,16 @@ function showSlip(){
       <label>Email<input name="email" type="email" autocomplete="email" placeholder="for your confirmation"></label>
       <label class="w">Delivery address *<textarea name="address" rows="3" required autocomplete="street-address" placeholder="House, street, area, city, PIN code"></textarea></label>
       <label class="w">Anything else?<textarea name="notes" rows="2" placeholder="Gifting, a date, a colour you have in mind…"></textarea></label>
-      <label class="consent"><input type="checkbox" name="marketing" value="yes">Keep me posted on new collections and offers from Everly White.</label>
+      <label class="consent"><input type="checkbox" name="marketing" value="yes">Keep me posted on new collections and offers from Everly White (by WhatsApp, email and Instagram / Google ads).</label>
+      <p class="privacy">Your details are used only to make, deliver and follow up on this order, and are kept privately by Everly White. We never sell them. Message us on WhatsApp any time to see, correct or delete them, or to stop hearing from us.</p>
+      <label class="hp" aria-hidden="true">Leave this empty<input name="hp_note" tabindex="-1" autocomplete="off"></label>
       <div class="cta w" style="grid-column:1/-1"><p class="formmsg" id="formMsg" role="alert"></p><button class="btn off" id="send" aria-disabled="true">Place order · ${inr(slipTotal())}</button></div>
     </form>`;
   const form = $('#form');
-  for (const [k, v] of Object.entries(draft)) if (form[k]) form[k].value = v;
+  // the shop iPad must not offer one customer's details to the next
+  if (KIOSK) form.querySelectorAll('input,textarea').forEach(el => el.setAttribute('autocomplete', 'off'));
+  for (const [k, v] of Object.entries(draft)) if (form[k] && k !== 'marketing' && k !== 'hp_note') form[k].value = v;
+  if (draft.marketing) form.marketing.checked = true;
   // Place order looks off (light brown) until name, WhatsApp number and delivery address are filled in.
   // It stays tappable: a tap on an incomplete form says what's missing instead of doing nothing.
   form.oninput = () => {
@@ -839,15 +884,25 @@ function showSlip(){
 }
 
 /* ===== send to Google Drive (via Apps Script) — kept on device until delivered ===== */
-async function flush(){
-  if (!CONFIG.SCRIPT_URL) return;
-  for (const r of store.get('ew-outbox', [])) {
-    try {
-      // text/plain + no-cors avoids the CORS preflight Apps Script can't answer
-      await fetch(CONFIG.SCRIPT_URL, {method:'POST', mode:'no-cors', headers:{'Content-Type':'text/plain'}, body:JSON.stringify(r)});
-      store.set('ew-outbox', store.get('ew-outbox', []).filter(x => x.id !== r.id));
-    } catch { return } // offline: retry on next load / when back online
-  }
+// One sender at a time (a second call joins the one running), so the same order is never sent twice at once.
+// It re-reads the outbox after each send, so an order added meanwhile goes out in the same run.
+// The script stores every order it receives before doing anything else (its Inbox tab), so once a send gets through,
+// the order is safe even if the script fails later; a send that doesn't get through (offline) stays here for the next try.
+let flushing = null;
+const outbox = () => { const b = store.get('ew-outbox', []); return Array.isArray(b) ? b.filter(x => x && typeof x === 'object') : [] };
+function flush(){
+  if (!CONFIG.SCRIPT_URL) return Promise.resolve();
+  return flushing ??= (async () => {
+    const tried = new Set();
+    for (let r; (r = outbox().find(x => !tried.has(x.id)));) {
+      tried.add(r.id);
+      try {
+        // text/plain + no-cors avoids the CORS preflight Apps Script can't answer
+        await fetch(CONFIG.SCRIPT_URL, {method:'POST', mode:'no-cors', headers:{'Content-Type':'text/plain'}, body:JSON.stringify(r)});
+        store.set('ew-outbox', outbox().filter(x => x.id !== r.id));
+      } catch { break } // offline: retry on next load / when back online
+    }
+  })().finally(() => { flushing = null });
 }
 addEventListener('online', flush);
 
@@ -855,18 +910,19 @@ addEventListener('online', flush);
 const isFilled = el => el.name === 'phone' ? el.value.replace(/\D/g, '').length >= 8 : !!el.value.trim();
 const missing = form => ['name', 'phone', 'address'].map(n => form.elements[n]).filter(el => !isFilled(el));
 
-// One cart line as the studio's invoice needs it: the photo (full web address, so the email can show it),
-// quantity, price and every choice the customer made.
+// One cart line as sent to the studio. orders.gs rebuilds name and price from kind + ref + opts and ignores the rest;
+// name, details, unit, image and choices are still sent so a not-yet-updated orders.gs keeps working.
 function invoiceLine(x){
   const p = x.kind === 'pair' && PAIRS.find(p => p.id === x.ref), c = x.kind === 'candle' && CANDLES.find(c => c.id === x.ref);
   const photo = p ? `assets/${p.im[0]}.webp` : c ? c.photo : '';
-  return {kind:x.kind, name:x.name, details:x.details, qty:x.qty, unit:x.unit, image: photo && new URL(photo, location.href).href,
+  return {kind:x.kind, ref:x.ref, opts:x.opts, name:x.name, details:x.details, qty:x.qty, unit:x.unit, image: photo && new URL(photo, location.href).href,
     choices: c ? [['Set', `Set of ${x.opts?.set || 1}`], ['Wax', WAX.find(w => w.id === x.opts?.wax)?.name || ''], ['Colour', colorName(x.opts?.hex)], ['Fragrance', x.opts?.frag || '']]
                : [['Piece', pieceOf(x.opts?.piece).name], ['Size', pieceOf(x.opts?.piece).size], ['Includes', pieceOf(x.opts?.piece).inc]]};
 }
 
 async function send(e){
   e.preventDefault();
+  if ($('#send').disabled) return;   // already placing this order
   const gaps = missing(e.target);
   if (gaps.length) {
     gaps.forEach(el => el.setAttribute('aria-invalid', 'true'));
@@ -879,19 +935,20 @@ async function send(e){
     id: 'EW-' + d.toISOString().slice(2,10).replace(/-/g,'') + '-' + Math.random().toString(36).slice(2,6).toUpperCase(),
     createdAt: d.toISOString(), customer: f, source: SRC.source,
     items: slip.map(invoiceLine),
-    estimate: slipTotal(), quoted: false,
   };
-  store.set('ew-outbox', [...store.get('ew-outbox', []), req]);
-  track('Purchase', {value: req.estimate, currency: 'INR', num_items: pieces()});
-  $('#send').disabled = true;
-  await flush();
+  store.set('ew-outbox', [...outbox(), req]);
+  track('Purchase', {value: slipTotal(), currency: 'INR', num_items: pieces()});
+  $('#send').disabled = true; $('#send').textContent = 'Placing your order…';
+  // The order is already saved on this device and goes out in the background (and again later if it must),
+  // so the customer waits at most a few seconds, never for the whole invoice to be made.
+  await Promise.race([flush(), new Promise(ok => setTimeout(ok, 3000))]);
   cz.close();
   $('#doneTitle').textContent = `Thank you, ${f.name.trim().split(' ')[0]}`;
   $('#doneMsg').innerHTML = `We have received your order <button type="button" class="oid" id="oid" title="Copy order number">${req.id}<span>Copy</span></button>, and we’ll get in touch with you on WhatsApp shortly.<span class="next">Next, we’ll send you a QR code for the full payment. Once it’s paid, we begin making your order by hand.</span>`;
   $('#oid').onclick = () => { navigator.clipboard?.writeText(req.id).then(() => { $('#oid span').textContent = 'Copied'; setTimeout(() => $('#oid span').textContent = 'Copy', 1600) }, () => {}) };
   showOrdered(slip);
   $('#wa').href = CONFIG.WHATSAPP;
-  $('#done').classList.add('on'); $('#done').scrollTop = 0;
+  $('#done').classList.add('on'); $('#done').scrollTop = 0; $('#doneTitle').focus({preventScroll:true});
   confetti();
   slip = []; saveSlip(); draft = {};
 }
@@ -945,6 +1002,20 @@ function confetti(){
 }
 
 function finish(){ $('#done').classList.remove('on'); go('world') }
+
+// Kiosk (shop iPad): after 2 minutes untouched, forget the last customer entirely — their typed details, their cart,
+// the thank-you page with their name — and go back to the start. Orders still waiting to send are kept.
+if (KIOSK) {
+  let idle;
+  const reset = () => {
+    draft = {}; slip = []; saveSlip();
+    document.querySelectorAll('dialog[open]').forEach(d => d.close());
+    $('#done').classList.remove('on'); go('home');
+  };
+  const wake = () => { clearTimeout(idle); idle = setTimeout(reset, 120000) };
+  ['pointerdown', 'keydown', 'wheel', 'touchstart', 'input'].forEach(t => addEventListener(t, wake, {capture:true, passive:true}));
+  wake();
+}
 
 // Meta Pixel and Google tag, loaded only when their IDs are set in CONFIG. They build the "visited / added to cart /
 // ordered" audiences for retargeting ads. track() is safe to call either way.
