@@ -41,7 +41,9 @@ button{cursor:pointer;border:0;background:none}
 .poster .ph:after{content:"";position:absolute;inset:0;background:linear-gradient(to bottom,transparent 55%,var(--paper))}
 @keyframes drift{to{transform:scale(1.06)}}
 .poster .tx{text-align:center;padding:8px 24px calc(28px + env(safe-area-inset-bottom))}
-.intro{font:400 clamp(13px,1.8vw,17px)/1 var(--text);letter-spacing:.45em;text-transform:uppercase}
+.home-logo{display:block;height:clamp(34px,4.4vw,58px);width:auto;margin:0 auto clamp(22px,3.4vh,40px)}
+.intro{font:400 clamp(13px,1.8vw,17px)/1 var(--text);letter-spacing:.45em;text-transform:uppercase;margin-right:-.45em}
+@media (max-width:480px){.intro{letter-spacing:.3em;margin-right:-.3em}}
 .title{font:400 clamp(46px,8vw,92px)/.95 var(--text);margin:14px 0 10px}
 .title small{font-size:.66em}
 .quote{font:italic clamp(22px,3vw,30px)/1.35 var(--text);margin:26px auto 30px}
@@ -80,6 +82,15 @@ header{position:sticky;top:0;z-index:20;background:rgba(255,255,255,.6);backdrop
 
 main{max-width:1240px;margin:0 auto;padding:0 24px calc(60px + env(safe-area-inset-bottom))}
 .panel{display:none}.panel.on{display:block;animation:fade .5s var(--ease)}
+.soon-panel{text-align:center;padding:90px 20px;border-bottom:1px solid var(--line)}
+.wip{position:relative;width:min(340px,80%);margin:0 auto 26px;overflow:hidden;box-shadow:0 18px 40px rgba(140,70,70,.14)}
+.wip img{display:block;width:100%;aspect-ratio:3/4;object-fit:cover;transform:scale(1.06)}
+.wip:after{content:"";position:absolute;inset:0;background:linear-gradient(110deg,transparent 30%,rgba(255,249,245,.35) 50%,transparent 70%);background-size:250% 100%;animation:shimmer 3.2s ease-in-out infinite}
+@keyframes shimmer{from{background-position:120% 0}to{background-position:-120% 0}}
+.wip figcaption{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:1;display:flex;align-items:center;gap:9px;white-space:nowrap;padding:11px 18px;background:rgba(255,249,245,.92);font:400 11px/1 var(--head);letter-spacing:.2em;text-transform:uppercase;color:var(--brown)}
+.wip figcaption i{width:7px;height:7px;border-radius:50%;background:var(--sun);animation:breathe 1.6s ease-in-out infinite}
+@media (prefers-reduced-motion:reduce){.wip:after,.wip figcaption i{animation:none}}
+.soon-panel p{font-style:italic;color:var(--mute);font-size:19px;max-width:440px;margin:0 auto}
 .intro-band{text-align:center;padding:72px 0 48px;max-width:700px;margin:0 auto}
 .intro-band h1{font:300 clamp(38px,5.8vw,64px)/1.05 var(--head);letter-spacing:.02em;margin:14px 0 6px}
 .orn{display:flex;align-items:center;gap:14px;width:200px;margin:0 auto 20px;color:var(--brown)}
@@ -104,6 +115,10 @@ main{max-width:1240px;margin:0 auto;padding:0 24px calc(60px + env(safe-area-ins
 .info{max-width:400px}
 .info h2{font:300 clamp(30px,3.8vw,46px)/1.08 var(--head);margin:12px 0 10px}
 .info .tag{font-style:italic;color:var(--mute);font-size:20px}
+.info .stand{display:flex;align-items:center;gap:10px;margin-top:16px;font:400 11px/1.3 var(--head);letter-spacing:.16em;text-transform:uppercase;color:var(--brown)}
+.info .stand svg,.pick .fixed svg{flex:none}.info .stand svg{width:22px;height:22px}
+.pc-note{display:grid;gap:4px;margin:12px 0 0;font:400 16.5px/1.4 var(--text);color:var(--ink)}
+.pc-note b{display:inline-block;min-width:84px;font:400 10.5px/1 var(--head);letter-spacing:.16em;text-transform:uppercase;color:var(--brown)}
 .info .price{margin-top:18px;font:400 17px/1 var(--head);letter-spacing:.08em;color:var(--brown)}
 .dots{display:flex;align-items:center;gap:4px;margin:20px 0 0 -7px}
 .dots button{width:44px;height:44px;display:grid;place-items:center}
@@ -117,6 +132,7 @@ main{max-width:1240px;margin:0 auto;padding:0 24px calc(60px + env(safe-area-ins
   .row:nth-child(even) .main{order:0}
   .main{aspect-ratio:1}
   .info{max-width:none;text-align:center}
+  .info .stand{justify-content:center}
   .dots{justify-content:center;margin-left:0}
 }
 .banner{position:relative;margin:0 calc(50% - 50vw);height:min(62vh,560px);overflow:hidden}
@@ -197,21 +213,45 @@ dialog::backdrop{background:rgba(30,30,30,.4);backdrop-filter:blur(3px)}
 .chip[aria-pressed=true]{background:var(--brown);color:var(--paper);border-color:var(--brown)}
 .chip small{display:block;font-size:13.5px;opacity:.75;line-height:1.25}
 .two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-/* customise options: three dropdowns, not walls of chips */
+/* customise options: soy wax + ivory are fixed (shown as a note), fragrance is the one dropdown */
+.pick .fixed{display:flex;align-items:flex-start;gap:12px;margin:0;padding:12px 16px;background:var(--pink);border-left:2px solid var(--brown);font:400 16px/1.45 var(--text);color:var(--ink)}
+.pick .fixed b{font-weight:600;color:var(--brown)}
+.pick .pk-l{display:block;margin-bottom:8px;font:400 10.5px/1 var(--head);letter-spacing:.16em;text-transform:uppercase;color:var(--brown)}
+.sets{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.sets .chip{text-align:center;padding:8px 6px;font-size:15.5px}
 .pick{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:22px 0 4px}
 .pick label{display:flex;flex-direction:column;gap:8px;font:400 10.5px/1 var(--head);letter-spacing:.16em;text-transform:uppercase;color:var(--brown)}
-.pick label.w{grid-column:1/-1}
+.pick .w{grid-column:1/-1}
 .pick select{appearance:none;-webkit-appearance:none;font:400 17px var(--text);letter-spacing:0;text-transform:none;color:var(--ink);background:var(--card) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%238C4646' stroke-width='1.5'/%3E%3C/svg%3E") no-repeat right 16px center;border:1px solid var(--line);border-radius:0;min-height:52px;padding:12px 44px 12px 14px;cursor:pointer}
 .pick select:focus{outline:none;border-color:var(--brown)}
-/* the chosen colour, as a dot inside the closed dropdown (the open list itself is the browser's own and can't show one) */
-.selwrap{position:relative;display:block}
-.selwrap select{width:100%}
-.pick select.withdot{padding-left:52px}
-.selwrap .dot{position:absolute;left:16px;top:50%;width:22px;height:22px;margin-top:-11px;border-radius:50%;border:1px solid rgba(0,0,0,.15);pointer-events:none}
+.gal{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.gal::-webkit-scrollbar{display:none}
+.cz .pv .gal>*{flex:0 0 100%;width:100%;height:100%;scroll-snap-align:center;object-fit:contain}
+.gnav{position:absolute;top:50%;width:44px;height:44px;margin-top:-22px;border-radius:50%;background:rgba(255,249,245,.92);color:var(--brown);font:300 28px/1 var(--head);box-shadow:0 4px 14px rgba(0,0,0,.08);transition:opacity .25s}
+.gnav.prev{left:12px}.gnav.next{right:12px}.gnav:disabled{opacity:0;pointer-events:none}
+.cz .pv .gnav{width:44px;height:44px}.cz .pv .gdots{width:auto;height:auto}
+.gdots{position:absolute;left:50%;bottom:18px;transform:translateX(-50%);display:flex;gap:6px;pointer-events:none}
+.gdots i{width:7px;height:7px;border-radius:50%;background:rgba(140,70,70,.3);transition:all .3s}
+.gdots i.on{width:20px;border-radius:4px;background:var(--brown)}
+@media (hover:none){.gnav{display:none}}
+.cz .opts-col .slipnote{width:calc(100% - 60px)}
 .slipnote{display:flex;justify-content:space-between;align-items:center;width:100%;min-height:46px;padding:0 14px;margin-bottom:18px;background:var(--pink);font:400 11px/1 var(--head);letter-spacing:.16em;text-transform:uppercase;color:var(--brown)}
 .slipnote span{font:italic 16px var(--text);letter-spacing:0;text-transform:none}
 .slip{list-style:none;margin:16px 0 0;border-top:1px solid var(--line)}
-.slip li{display:grid;grid-template-columns:auto 1fr auto;gap:14px;align-items:start;padding:14px 0;border-bottom:1px dashed var(--line)}
+.slip li{display:grid;grid-template-columns:22px 64px 1fr auto;gap:14px;align-items:start;padding:14px 0;border-bottom:1px dashed var(--line)}
+.slip .th{width:64px;height:64px;object-fit:cover;background:var(--pink);border:1px solid var(--line)}
+.cz.slipping .pv{aspect-ratio:auto;height:94dvh;max-height:none;background:var(--paper)}
+.mycart{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin:0 0 6px}
+.mycart span{font:400 11px/1 var(--head);letter-spacing:.16em;text-transform:uppercase;color:var(--paper);background:var(--brown);padding:7px 12px;border-radius:20px}
+.giftpv{position:relative;margin:0;width:100%;height:100%}
+.cz .pv .giftpv img{width:100%;height:100%;object-fit:cover;object-position:28% 50%;display:block}
+.giftpv figcaption{position:absolute;left:24px;right:24px;bottom:24px;padding:18px 20px;background:rgba(255,249,245,.9);backdrop-filter:blur(6px)}
+.giftpv p{margin:8px 0 0;font:italic 16.5px/1.4 var(--text);color:var(--mute)}
+.unbox{flex:none;padding:22px 24px 24px;background:var(--pink)}
+.unbox p{margin:8px 0 14px;font:italic 16px/1.4 var(--text);color:var(--mute)}
+.ub-ph{display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:6px}
+.ub-ph img{width:100%;height:clamp(96px,16dvh,150px);object-fit:cover;display:block}
+.unbox-m{display:none;margin:18px 0 4px}
 .slip .no{font:400 13px/1.6 var(--head);color:var(--brown);letter-spacing:.08em}
 .slip b{font-weight:500}
 .slip small{display:block;color:var(--mute);font-size:15px;line-height:1.35}
@@ -247,6 +287,7 @@ form.f{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
   .cz{grid-template-columns:minmax(0,1fr)}.cz .pv{position:relative;width:100%;aspect-ratio:1;max-height:56dvh;justify-self:center}
   /* on a phone the slip is a list to read, not a picture to look at: drop the photo, keep the close button clear */
   .cz.slipping .pv{display:none}.cz.slipping .opts-col{padding-top:60px}
+  .unbox-m{display:block}.unbox{padding:18px}
   .cta{gap:10px}.cta .btn{padding:0 16px}.cta .qty button{width:42px}
   .cz .opts-col{padding:22px 18px 0}.cz h2{font-size:28px}
   .two,form.f{grid-template-columns:1fr}
@@ -267,6 +308,38 @@ form.f{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
 #done{padding-top:calc(64px + env(safe-area-inset-top))}
 #done h2{font:300 clamp(30px,5vw,44px)/1.1 var(--head);margin:8px 0 10px}
 #done .msg{max-width:31em;margin:0 auto;color:var(--body)}
+/* entrance: tick draws itself, then each block rises in turn */
+.seal{width:62px;height:62px;display:block;margin:0 auto 14px;fill:none;stroke:var(--brown);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.seal circle{stroke-dasharray:183;stroke-dashoffset:183}.seal path{stroke-dasharray:40;stroke-dashoffset:40}
+#done.on .seal circle{animation:draw .9s .15s var(--ease) forwards}#done.on .seal path{animation:draw .5s .9s var(--ease) forwards}
+@keyframes draw{to{stroke-dashoffset:0}}
+@keyframes rise{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+#done.on .ready{animation:rise .7s .6s var(--ease) both}#done.on h2{animation:rise .7s .75s var(--ease) both}
+#done.on .msg{animation:rise .7s .9s var(--ease) both}#done.on .steps{animation:rise .7s 1.05s var(--ease) both}
+#done.on .done-acts{animation:rise .7s 1.35s var(--ease) both}
+.oid{display:inline-flex;align-items:baseline;gap:6px;font:600 1em var(--text);color:var(--ink);border-bottom:1px dashed var(--brown);padding:0 2px;cursor:pointer}
+.oid span{font:400 10px/1 var(--head);letter-spacing:.14em;text-transform:uppercase;color:var(--brown)}
+/* what happens next */
+.steps{list-style:none;display:grid;grid-template-columns:repeat(4,1fr);max-width:620px;margin:26px auto 0;padding:0;position:relative}
+.steps:before{content:"";position:absolute;top:8px;left:12.5%;right:12.5%;height:1px;background:var(--line)}
+.steps:after{content:"";position:absolute;top:8px;left:12.5%;width:0;height:1px;background:var(--brown);transition:width 1.2s 1.5s var(--ease)}
+#done.on .steps:after{width:25%}
+.steps li{position:relative;display:flex;flex-direction:column;align-items:center;gap:4px;padding:0 4px}
+.steps i{width:17px;height:17px;border-radius:50%;background:var(--paper);border:1px solid var(--pink3);margin-bottom:6px;position:relative;z-index:1}
+.steps .ok i{background:var(--brown);border-color:var(--brown)}
+.steps .now i{border-color:var(--brown);box-shadow:0 0 0 0 rgba(140,70,70,.4);animation:ping 1.8s 2s ease-out infinite}
+.steps .now i:after{content:"";position:absolute;inset:4px;border-radius:50%;background:var(--brown)}
+@keyframes ping{70%{box-shadow:0 0 0 9px rgba(140,70,70,0)}100%{box-shadow:0 0 0 0 rgba(140,70,70,0)}}
+.steps b{font:400 11px/1.3 var(--head);letter-spacing:.12em;text-transform:uppercase;color:var(--brown)}
+.steps li:not(.ok):not(.now) b{color:var(--mute)}
+.steps small{font:italic 14px/1.3 var(--text);color:var(--mute)}
+@media (max-width:520px){.steps b{font-size:9.5px;letter-spacing:.06em}.steps small{font-size:12.5px}}
+/* each piece slides in one after another */
+#done.on .slide{animation:rise .6s var(--ease) both}
+#done.on .slide:nth-child(1){animation-delay:1.2s}#done.on .slide:nth-child(2){animation-delay:1.32s}#done.on .slide:nth-child(3){animation-delay:1.44s}
+.slide{transition:transform .35s var(--ease),box-shadow .35s}
+@media (hover:hover){.slide:hover{transform:translateY(-3px);box-shadow:0 12px 28px rgba(140,70,70,.12)}}
+@media (prefers-reduced-motion:reduce){#done.on *{animation:none!important;transition:none!important}.seal circle,.seal path{stroke-dashoffset:0}#done .steps:after{width:25%}}
 /* what was ordered: one swipeable card per piece */
 .ordered{max-width:560px;margin:28px auto 26px;animation:fade .6s .9s var(--ease) both}
 .ordered-head{font:400 13px/1 var(--head);letter-spacing:.16em;text-transform:uppercase;color:var(--brown);margin-bottom:12px}
@@ -320,7 +393,8 @@ form.f{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
   <div class="poster">
     <div class="ph"><img src="assets/hero-cotu.jpg" alt="A couple walking hand in hand in golden light"></div>
     <div class="tx">
-      <div class="intro">Introducing</div>
+      <img class="home-logo" src="assets/logo.png" alt="Everly White">
+      <div class="intro">Presents</div>
       <div class="title">Center<br><small>of the</small> Universe</div>
       <div class="intro">Collection</div>
       <p class="quote">“What’s meant for you will<br>always find you!”</p>
@@ -342,8 +416,9 @@ form.f{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
     <nav class="cats" role="tablist" aria-label="Collections">
       <button role="tab" aria-selected="true" data-tab="cotu">Centerpieces</button>
       <button role="tab" aria-selected="false" data-tab="mystic">Exotic Candles</button>
+      <button role="tab" aria-selected="false" data-tab="statement">Statement Pieces</button>
     </nav>
-    <button class="cart" id="cartBtn" aria-label="Cart"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M5 8h14l-1.2 12H6.2zM9 8V6.5a3 3 0 0 1 6 0V8"/></svg><b id="count">0</b><span>Cart</span></button>
+    <button class="cart" id="cartBtn" aria-label="Cart"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M5 8h14l-1.2 12H6.2zM9 8V6.5a3 3 0 0 1 6 0V8"/></svg><b id="count">0</b><span>My Cart</span></button>
   </div></header>
   <main>
     <div class="banner"><img src="assets/coll-banner.png" alt="Two hands reaching toward each other beneath a glowing sacred geometry pattern">
@@ -351,6 +426,9 @@ form.f{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
     <!-- products of the category chosen in the header -->
     <div class="shop">
       <div class="shop-main">
+        <div class="panel" id="p-statement">
+          <div class="soon-panel"><figure class="wip"><img src="assets/statement-blur.jpg" alt="A statement piece, still being made"><figcaption><i></i>In the making</figcaption></figure><p>Our statement pieces are being finished by hand. Unveiling shortly.</p></div>
+        </div>
         <div class="panel on" id="p-cotu">
           <div id="pairs"></div>
         </div>
@@ -372,9 +450,16 @@ form.f{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
 <!-- confirmation -->
 <section id="done">
   <canvas id="confetti" aria-hidden="true"></canvas>
+  <svg class="seal" viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="29"/><path d="M20 33l8 8 16-17"/></svg>
   <div class="ready"><i></i>Order received</div>
   <h2 id="doneTitle">Thank you</h2>
   <p class="msg" id="doneMsg"></p>
+  <ol class="steps" aria-label="What happens next">
+    <li class="ok"><i></i><b>Order received</b><small>Saved with us</small></li>
+    <li class="now"><i></i><b>QR on WhatsApp</b><small>For the full payment</small></li>
+    <li><i></i><b>Made by hand</b><small>Once payment is in</small></li>
+    <li><i></i><b>Gift-boxed &amp; sent</b><small>Sealed in our signature box</small></li>
+  </ol>
   <div class="ordered">
     <div class="ordered-head" id="doneHead"></div>
     <div class="car" id="doneCar" aria-label="What you ordered"></div>
@@ -395,7 +480,7 @@ const SRC = {source: Q.get('src') || 'direct', ig: (Q.get('ig') || '').replace(/
 
 const CONFIG = {
   // Paste the Web App URL from orders.gs (Google Apps Script) here. Until then enquiries stay saved on this device and are sent once it's set.
-  SCRIPT_URL: '',
+  SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbyFSoqFth9Zp9N5SXkOtifsYsIrwQy-Sp6Ytkt_apSyj7ineKqV0hGJuXHzzn9vOCc6BQ/exec',
   WHATSAPP: 'https://wa.me/message/OEJJOG6DF762J1',
   // Ad audiences: paste your IDs to switch these on. Left blank, nothing loads.
   META_PIXEL_ID: '',     // Meta Events Manager → Data sources → your Pixel ID (digits)
@@ -406,54 +491,49 @@ const CONFIG = {
 const COLORS = [['Ivory','#F1E9DC'],['Blush','#F2C9C4'],['Sage','#B4C2A4']];
 const WAX = [
   {id:'soy', name:'Soy wax', note:'Natural, clean & slow burning'},
-  {id:'paraffin', name:'Paraffin wax', note:'Crisp colour, stronger scent throw'},
 ];
 const FRAGS = ['Sandalwood & Amber','Jasmine Sambac','French Lavender','Vanilla Bean','Rose Oud','Ocean Mist','Lemongrass','Unscented'];
 
 // Candles: a photo plus its mask (make the mask with make-mask.py) so it can be recoloured.
-// price: ₹ per candle for each wax — the wax is the one choice that changes the price.
+// Price per set, same for every candle. A candle with its own prices gets sets:{1:…, 2:…, 3:…, 4:…}.
+const SETS = {1:1400, 2:2500, 4:4200};
+const firstSet = c => +Object.keys(c.sets || SETS)[0];
+const setPrice = (c, n) => (c.sets || SETS)[n] ?? (c.sets || SETS)[firstSet(c)];
 // ponytail: name, text and PRICES are placeholders until the real mould list and price list are in.
 const CANDLES = [
   // No mask yet: shown as photographed. Drop the photos in at these paths (any size; square looks best).
-  {id:'ripple', name:'Ripple Tower', tag:'Tall, fluted and softly stacked.', photo:'assets/candles/ripple.jpg', mask:null,
-   desc:'Deep flutes run from a slender crown down through stacked, rounded tiers, so the light pools in every rib.',
-   price:{soy:1199, paraffin:999}},
-  {id:'pillar', name:'Crown Pillar', tag:'Tall, fluted and quietly grand.', photo:'assets/candles/pillar.jpg', mask:null,
-   desc:'A flared, fluted crown rises over a ringed collar and a rounded bead, then tapers to a fluted base. Striking as a pair.',
-   price:{soy:1199, paraffin:999}},
-  {id:'minaret', name:'Minaret Drop', tag:'A fluted teardrop on two soft beads.', photo:'assets/candles/minaret.jpg', mask:null,
-   desc:'A tall, fluted teardrop rises from two stacked, ribbed beads, like the spire of a minaret catching evening light.',
-   price:{soy:1199, paraffin:999}},
-  {id:'heirloom', name:'Heirloom Finial', tag:'Ornate, beaded and made to be kept.', photo:'assets/candles/heirloom.jpg', mask:null,
-   desc:'Floral medallions and beaded bands wrap a rounded body and a flame-shaped crown, like a carved heirloom you light.',
-   price:{soy:1199, paraffin:999}},
-  {id:'spire', name:'Temple Spire', tag:'Slender, ringed and reaching upward.', photo:'assets/candles/spire.jpg', mask:null,
-   desc:'A fine spire wrapped in stacked rings crowns a ribbed bulb on a scalloped base, made for altars and pooja spaces.',
-   price:{soy:1199, paraffin:999}},
-  {id:'muse', name:'Hourglass Muse', tag:'Curved, ribbed and gently sculptural.', photo:'assets/candles/muse.jpg', mask:null,
-   desc:'A ribbed hourglass silhouette with a soft, rounded crown, catching light along every curve.',
-   price:{soy:1199, paraffin:999}},
-  {id:'twist', name:'Honeycomb Twist', tag:'A soft knot of honeycomb texture.', photo:'assets/candles/twist.jpg', mask:null,
-   desc:'A twisted taper wrapped in a honeycomb pattern, playful on its own and beautiful in a row of three shades.',
-   price:{soy:1199, paraffin:999}},
-  {id:'amphora', name:'Swirl Amphora', tag:'A swirled vase, cast in wax.', photo:'assets/candles/amphora.jpg', mask:null,
-   desc:'A slender amphora with soft spiral fluting on a carved, turned pedestal, elegant on a console or pooja shelf.',
-   price:{soy:1199, paraffin:999}},
-  {id:'lantern', name:'Lantern Taper', tag:'A tall taper on a ribbed lantern base.', photo:'assets/candles/lantern.jpg', mask:null,
-   desc:'A slim, fluted taper rises from a rounded, ribbed base, beautiful grouped in mixed heights and shades down a dining table.',
-   price:{soy:1199, paraffin:999}},
+  {id:'ripple', name:'Ripple Tower', tag:'Tall, fluted and softly stacked.', photo:'assets/candles/ripple.jpg?v=2', mask:null,
+   desc:'Deep flutes run from a slender crown down through stacked, rounded tiers, so the light pools in every rib.'},
+  {id:'pillar', name:'Crown Pillar', tag:'Tall, fluted and quietly grand.', photo:'assets/candles/pillar.jpg?v=2', mask:null,
+   desc:'A flared, fluted crown rises over a ringed collar and a rounded bead, then tapers to a fluted base. Striking as a pair.'},
+  {id:'minaret', name:'Minaret Drop', tag:'A fluted teardrop on two soft beads.', photo:'assets/candles/minaret.jpg?v=2', mask:null, sets:{2:1599},
+   desc:'A tall, fluted teardrop rises from two stacked, ribbed beads, like the spire of a minaret catching evening light.'},
+  {id:'spire', name:'Temple Spire', tag:'Slender, ringed and reaching upward.', photo:'assets/candles/spire.jpg?v=2', mask:null,
+   desc:'A fine spire wrapped in stacked rings crowns a ribbed bulb on a scalloped base, made for altars and pooja spaces.'},
+  {id:'muse', name:'Hourglass Muse', tag:'Curved, ribbed and gently sculptural.', photo:'assets/candles/muse.jpg?v=2', mask:null,
+   desc:'A ribbed hourglass silhouette with a soft, rounded crown, catching light along every curve.'},
+  {id:'twist', name:'Honeycomb Twist', tag:'A soft knot of honeycomb texture.', photo:'assets/candles/twist.jpg?v=2', mask:null,
+   desc:'A twisted taper wrapped in a honeycomb pattern, playful on its own and beautiful as a pair.'},
+  {id:'amphora', name:'Swirl Amphora', tag:'A swirled vase, cast in wax.', photo:'assets/candles/amphora.jpg?v=2', mask:null,
+   desc:'A slender amphora with soft spiral fluting on a carved, turned pedestal, elegant on a console or pooja shelf.'},
+  {id:'lantern', name:'Lantern Taper', tag:'A tall taper on a ribbed lantern base.', photo:'assets/candles/lantern.jpg?v=2', mask:null, sets:{2:2900},
+   desc:'A slim, fluted taper rises from a rounded, ribbed base, beautiful as a pair down a dining table.'},
+  {id:'urn', name:'Maharani Urn', tag:'Ornate, regal and richly carved.', photo:'assets/candles/urn.jpg?v=2', mask:null,
+   desc:'Lace-like borders, floral medallions and carved scrollwork rise to a beaded, flame-shaped crown, a royal piece for the queen of the home.'},
+  {id:'palace', name:'Palace Column', tag:'A carved pillar, crowned like a palace.', photo:'assets/candles/palace.jpg?v=2', mask:null,
+   desc:'Acanthus scrolls and floral panels climb a square column to a tiered, domed crown, a stately piece for the king of the home.'},
 ];
 
 const PAIRS = [
-  {id:'EW-01', name:'Twin Flames', tag:'One soul, two bodies.', price:6801, im:['tf-1','tf-2','tf-3'], motif:'Mandala with diamond inlay',
+  {id:'EW-01', name:'Twin Flames', tag:'One soul, two bodies.', price:6801, im:['tf-1','tf-2','tf-3','tf-4','tf-5'], motif:'Mandala with diamond inlay',
    desc:'Two hand-carved plates share one motif that only completes itself when they sit together, a quiet picture of the Divine Masculine and Divine Feminine.'},
-  {id:'EW-02', name:'Lunar Bond', tag:'Forever in orbit.', price:6881, im:['lb-1','lb-2','lb-3'], motif:'Radiating lunar rings',
+  {id:'EW-02', name:'Lunar Bond', tag:'Forever in orbit.', price:6881, im:['lb-1','lb-2','lb-3','lb-4','lb-5'], motif:'Radiating lunar rings',
    desc:'Gentle, intuitive and deeply felt. Carved in a radiating lunar motif, the mirror settles into the surface a little differently on every piece.'},
-  {id:'EW-03', name:'Star Crossed Lovers', tag:'Written in the stars.', price:6101, im:['scl-1','scl-2','scl-3'], motif:'Eight-point star',
+  {id:'EW-03', name:'Star Crossed Lovers', tag:'Written in the stars.', price:6101, im:['scl-1','scl-2','scl-3','scl-4','scl-5'], motif:'Eight-point star',
    desc:'For the meetings that change everything. An eight-point star is carved across both plates and set with mirror by hand.'},
-  {id:'EW-04', name:'Butterfly Effect', tag:'A small flutter.', price:6501, im:['be-1','be-2','be-3'], motif:'Floral wings, teardrop mirrors',
+  {id:'EW-04', name:'Butterfly Effect', tag:'A small flutter.', price:6501, im:['be-1','be-2','be-3','be-4','be-5'], motif:'Floral wings, teardrop mirrors',
    desc:'Even the smallest flutter can shape a lifetime. A floral, wing-like carving spans both plates, petals seeming to move from one to the other.'},
-  {id:'EW-05', name:'String of Fate', tag:'An invisible thread.', price:6501, im:['sof-1','sof-2','sof-3'], motif:'Fine open lattice',
+  {id:'EW-05', name:'String of Fate', tag:'An invisible thread.', price:6501, im:['sof-1','sof-2','sof-3','sof-4','sof-5'], motif:'Fine open lattice',
    desc:'An invisible thread connects those meant to meet. Carved as a fine lattice, a thread of light runs through the whole piece.'},
 ];
 
@@ -468,8 +548,9 @@ const store = {
 function go(v){ document.querySelectorAll('.view').forEach(e => e.classList.toggle('on', e.id === v)); scrollTo(0,0) }
 // Banner words for each category; the text fades across when the tab changes.
 const BANNER = {
+  statement: ['Coming Soon', 'Statement Pieces', 'One-of-a-kind pieces, made to be the first thing anyone notices.'],
   cotu: ['The Debut Collection', 'Center of the Universe', 'Hand-carved mirror-inlay pairs, made to sit together at the heart of your home.'],
-  mystic: ['The Candle Atelier', 'Mystic Flames', 'Sculpted candles from rare moulds, poured by hand in your colour, wax and fragrance.'],
+  mystic: ['The Candle Atelier', 'Mystic Flames', 'Sculpted candles for the king and queen of the home, hand-poured in pure soy wax and scented your way.'],
 };
 function tab(t){
   const bt = $('#bannerText'), [l, h, p] = BANNER[t];
@@ -548,21 +629,21 @@ document.querySelectorAll('#candles .row').forEach(row => {
 $('#pairs').innerHTML = PAIRS.map((p, i) => `<section class="row" data-p="${i}">
   <div class="main"><img src="assets/${p.im[0]}.webp" alt="${esc(p.name)}" loading="lazy"></div>
   <div class="info"><div class="lbl">${p.id}</div><h2>${esc(p.name)}</h2><div class="tag">${esc(p.tag)}</div>
-    <div class="price">${inr(p.price)}</div>
-    <div class="acts"><button class="btn ghost" data-photos>View photos</button><button class="btn" data-order>Add to cart</button></div></div>
+    <div class="stand"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="12" cy="9" r="6"/><path d="M8 14l-3 7M16 14l3 7M12 15v6"/></svg>Comes with gold display stands</div>
+    <div class="acts"><button class="btn ghost" data-photos>View photos</button><button class="btn" data-order>Customise</button></div></div>
 </section>`).join('');
 
 document.querySelectorAll('#pairs .row').forEach(row => {
   const p = PAIRS[row.dataset.p];
   row.querySelector('[data-photos]').onclick = () => openPhotos(p.im.map(n => `<img src="assets/${n}.webp" alt="">`));
-  row.querySelector('[data-order]').onclick = e => addPair(p, e.currentTarget);
+  row.querySelector('[data-order]').onclick = () => customisePair(p);
 });
 
 /* ===== photos ===== */
 const photos = $('#photos');
 function openPhotos(html){ $('#strip').innerHTML = html.join(''); photos.showModal(); $('#strip').scrollLeft = 0 }
 function candlePhotos(c){
-  if (!c.mask) return openPhotos([`<img src="${c.photo}" alt="">`]);
+  if (!c.mask) return openPhotos([`<img src="${c.photo}" alt="">`, `<img src="assets/candles/${c.id}-spec.jpg?v=3" alt="${esc(c.name)}: size, burn time, wax and weight">`]);
   openPhotos([`<img src="${c.photo}" alt="">`, ...COLORS.map(() => '<img alt="">')]);
   [...$('#strip').querySelectorAll('img')].slice(1).forEach((img, i) => paint(c, COLORS[i][1]).then(u => img.src = u, () => img.remove()));
 }
@@ -577,7 +658,8 @@ let slip = store.get('ew-slip', []);
 // A saved cart always shows today's prices (and drops pieces no longer in the catalogue).
 slip = slip.filter(x => {
   const p = x.kind === 'pair' && PAIRS.find(p => p.id === x.ref), c = x.kind === 'candle' && CANDLES.find(c => c.id === x.ref);
-  if (p) x.unit = p.price; else if (c) x.unit = c.price[x.opts?.wax] ?? x.unit;
+  if (c && !(c.sets || SETS)[x.opts?.set]) { x.opts = {...x.opts, set:firstSet(c)}; x.details = x.details.replace(/^Set of \d+/, 'Set of ' + firstSet(c)) }
+  if (p) x.unit = piecePrice(p, x.opts?.piece || 'pair'); else if (c) x.unit = setPrice(c, x.opts.set);
   return p || c;
 });
 let draft = {};   // the details form, kept while the customer goes off to add or edit a piece
@@ -589,57 +671,100 @@ const slipTotal = () => slip.reduce((a, x) => a + x.unit * x.qty, 0);
 const pieces = () => slip.reduce((a, x) => a + x.qty, 0);
 const plural = n => `${n} piece${n === 1 ? '' : 's'}`;
 
+// pvHTML: one picture, or a list of slides to swipe through (arrows and dots for mouse users).
 function openSheet(pvHTML){
+  const many = Array.isArray(pvHTML) && pvHTML.length > 1;
+  const pv = !Array.isArray(pvHTML) ? pvHTML : !many ? pvHTML[0] :
+    `<div class="gal">${pvHTML.join('')}</div><button class="gnav prev" aria-label="Previous photo">‹</button><button class="gnav next" aria-label="Next photo">›</button>
+     <div class="gdots">${pvHTML.map((_, i) => `<i class="${i ? '' : 'on'}"></i>`).join('')}</div>`;
   $('#czBody').classList.remove('slipping');
-  $('#czBody').innerHTML = `<div class="pv">${pvHTML}<span class="sw-name"></span></div><div class="opts-col" id="czOpts"></div>`;
+  $('#czBody').innerHTML = `<div class="pv">${pv}<span class="sw-name"></span></div><div class="opts-col" id="czOpts"></div>`;
+  if (many) {
+    const g = $('#czBody .gal'), dots = $('#czBody .gdots').children, n = pvHTML.length;
+    const at = () => Math.round(g.scrollLeft / g.clientWidth);
+    const to = i => g.scrollTo({left: Math.max(0, Math.min(n - 1, i)) * g.clientWidth, behavior: 'smooth'});
+    $('#czBody .prev').onclick = () => to(at() - 1); $('#czBody .next').onclick = () => to(at() + 1);
+    g.onscroll = () => { const i = at(); [...dots].forEach((d, k) => d.classList.toggle('on', k === i));
+      $('#czBody .prev').disabled = i === 0; $('#czBody .next').disabled = i === n - 1 };
+  }
   if (!cz.open) cz.showModal();
+  if (many) $('#czBody .gal').onscroll();   // after showing: the gallery has no width while hidden
 }
 
 // opts/edit: reopening a line from the slip to change it.
 function customise(c, hex, opts, edit){
-  sel = {c, hex: opts?.hex || hex || COLORS[0][1], wax: opts?.wax || WAX[0].id, frag: opts?.frag || FRAGS[0], qty: opts?.qty || 1, edit};
-  openSheet('<div class="slot" style="width:100%;height:100%"></div>');
+  sel = {c, hex: COLORS[0][1], wax: WAX[0].id, frag: opts?.frag || FRAGS[0], set: (c.sets || SETS)[opts?.set] ? opts.set : firstSet(c), qty: opts?.qty || 1, edit};
+  openSheet(['<div class="slot" style="width:100%;height:100%"></div>', `<img src="assets/candles/${c.id}-spec.jpg?v=3" alt="${esc(c.name)}: size, burn time, wax and weight">`]);
   renderOpts();
 }
 function pv(){ show($('#czBody .pv .slot'), sel.c, sel.hex); $('#czBody .sw-name').textContent = sel.c.mask ? `${sel.c.name} in ${colorName(sel.hex)}` : sel.c.name }
-// Price of one candle as chosen — set by the wax.
-const unitPrice = () => sel.c.price[sel.wax];
+// Price of one set as chosen.
+const unitPrice = () => setPrice(sel.c, sel.set);
 function renderOpts(){
   const c = sel.c, editing = sel.edit != null;
   $('#czOpts').innerHTML = `${slip.length && !editing ? `<button class="slipnote" id="toSlip">Your cart · ${plural(pieces())}<span>View →</span></button>` : ''}
     <div class="lbl">${editing ? 'Change this piece' : 'Customise'}</div><h2>${esc(c.name)}</h2><div class="sub">${esc(c.tag)}</div><p class="desc">${esc(c.desc)}</p>
     <div class="pick">
-      <label class="w">1 · Wax<select data-k="wax">${WAX.map(w => `<option value="${w.id}" ${w.id === sel.wax ? 'selected' : ''}>${w.name} — ${inr(c.price[w.id])}</option>`).join('')}</select></label>
-      <label class="w">2 · Colour<span class="selwrap"><i class="dot" id="dot" style="background:${sel.hex}"></i><select data-k="hex" class="withdot">${COLORS.map(([n, h]) => `<option value="${h}" ${h === sel.hex ? 'selected' : ''}>${n}</option>`).join('')}</select></span></label>
-      <label class="w">3 · Fragrance<select data-k="frag">${FRAGS.map(f => `<option ${f === sel.frag ? 'selected' : ''}>${esc(f)}</option>`).join('')}</select><em class="hint">Smell the test pieces, then choose.</em></label>
+      <p class="w fixed"><span>Every candle is made of <b>100% soy wax</b> in an <b>${colorName(sel.hex).toLowerCase()}</b> (off-white) colour. You don't need to choose these.</span></p>
+      ${Object.keys(c.sets || SETS).length === 1 ? `<p class="w fixed"><span>Sold only as a <b>pair (set of ${sel.set})</b> · <b>${inr(unitPrice())}</b></span></p>` : `<div class="w"><span class="pk-l">Set size</span><div class="sets">${Object.keys(c.sets || SETS).map(Number).map(n => `<button type="button" class="chip" data-set="${n}" aria-pressed="${n === sel.set}">Set of ${n}<small>${inr(setPrice(c, n))}</small></button>`).join('')}</div></div>`}
+      <label class="w">Fragrance<select data-k="frag">${FRAGS.map(f => `<option ${f === sel.frag ? 'selected' : ''}>${esc(f)}</option>`).join('')}</select><em class="hint">Smell the test pieces, then choose.</em></label>
     </div>
     <div class="cta"><div class="qty"><button data-q="-1" aria-label="Fewer">−</button><output>${sel.qty}</output><button data-q="1" aria-label="More">+</button></div>
       <div class="total"><small>Total</small><b id="total"></b></div>
       <button class="btn" id="addSlip">${editing ? 'Save changes' : 'Add to cart'}</button></div>`;
   const total = () => $('#total').textContent = inr(unitPrice() * sel.qty);
   total();
-  // Dropdowns update the choice in place; only colour changes the preview.
-  $('#czOpts').querySelectorAll('select[data-k]').forEach(s => s.onchange = () => { sel[s.dataset.k] = s.value; if (s.dataset.k === 'hex') { pv(); $('#dot').style.background = s.value } total() });
+  $('#czOpts').querySelectorAll('select[data-k]').forEach(s => s.onchange = () => { sel[s.dataset.k] = s.value; total() });
+  $('#czOpts').querySelectorAll('[data-set]').forEach(b => b.onclick = () => { sel.set = +b.dataset.set; renderOpts() });
   $('#czOpts').querySelectorAll('[data-q]').forEach(b => b.onclick = () => { sel.qty = Math.max(1, Math.min(50, sel.qty + +b.dataset.q)); renderOpts() });
   if (slip.length && !editing) $('#toSlip').onclick = showSlip;
   $('#addSlip').onclick = () => {
     const line = {kind:'candle', ref:c.id, name:`${c.name} candle`, unit:unitPrice(), qty:sel.qty,
-      details:`${WAX.find(w => w.id === sel.wax).name} · ${colorName(sel.hex)} · ${sel.frag}`,
-      opts:{wax:sel.wax, hex:sel.hex, frag:sel.frag}};
+      details:`Set of ${sel.set} · ${WAX.find(w => w.id === sel.wax).name} · ${colorName(sel.hex)} · ${sel.frag}`,
+      opts:{set:sel.set, wax:sel.wax, hex:sel.hex, frag:sel.frag}};
     if (editing) slip[sel.edit] = line; else { slip.push(line); track('AddToCart', {value: line.unit * line.qty, currency: 'INR', content_name: line.name}) }
     saveSlip(); showSlip();
   };
   pv();
 }
-// Adds a pair to the cart and stays on the page; the header count shows it landed.
-function addPair(p, btn){
-  const same = slip.find(x => x.ref === p.id);
-  if (same) same.qty++;
-  else slip.push({kind:'pair', ref:p.id, name:p.name, unit:p.price, qty:1, details:'Pair · Ø 31 + 21 cm · stands, cards & gift box'});
-  saveSlip(); track('AddToCart', {value: p.price, currency: 'INR', content_name: p.name});
-  const c = $('#cartBtn'); c.classList.remove('pulse'); void c.offsetWidth; c.classList.add('pulse');
-  btn.textContent = 'Added ✓'; btn.classList.add('added');
-  setTimeout(() => { btn.textContent = 'Add to cart'; btn.classList.remove('added') }, 1600);
+// Centerpieces sell as the pair, or either plate on its own. Every option comes with its stand.
+const PIECES = [
+  {id:'pair',   name:'The Pair',     size:'Male Ø 31 cm + Female Ø 21 cm', inc:'2 gold stands, 2 brand cards & gift box'},
+  {id:'male',   name:'Male piece',   size:'The larger plate · Ø 31 cm',    inc:'Gold stand & brand card'},
+  {id:'female', name:'Female piece', size:'The smaller plate · Ø 21 cm',   inc:'Gold stand & brand card'},
+];
+// ponytail: single-plate prices are placeholders (60% / 45% of the pair) until the real ones are in; set p.prices = {male:…, female:…} to override.
+// (function declarations, not consts: the saved cart is re-priced before this point in the script)
+function piecePrice(p, id){ return p.prices?.[id] ?? (id === 'pair' ? p.price : Math.round(p.price * (id === 'male' ? .6 : .45) / 100) * 100 + 1) }
+function pieceOf(id){ return PIECES.find(x => x.id === id) || PIECES[0] }
+let psel;
+function customisePair(p, opts, edit){
+  psel = {p, piece: pieceOf(opts?.piece).id, qty: opts?.qty || 1, edit};
+  openSheet(p.im.map((n, i) => `<img src="assets/${n}.webp" alt="${i ? '' : esc(p.name)}">`));
+  $('#czBody .sw-name').textContent = p.name;
+  renderPair();
+}
+function renderPair(){
+  const {p} = psel, editing = psel.edit != null, pc = pieceOf(psel.piece);
+  $('#czOpts').innerHTML = `${slip.length && !editing ? `<button class="slipnote" id="toSlip">Your cart · ${plural(pieces())}<span>View →</span></button>` : ''}
+    <div class="lbl">${editing ? 'Change this piece' : 'Customise'}</div><h2>${esc(p.name)}</h2><div class="sub">${esc(p.tag)}</div><p class="desc">${esc(p.desc)}</p>
+    <div class="pick">
+      <p class="w fixed"><span>Comes with <b>gold display stand${psel.piece === 'pair' ? 's' : ''}</b> and a <b>${psel.piece === 'pair' ? 'gift box' : 'brand card'}</b>, at no extra cost.</span></p>
+      <div class="w"><span class="pk-l">Choose your piece</span><div class="sets">${PIECES.map(x => `<button type="button" class="chip" data-piece="${x.id}" aria-pressed="${x.id === psel.piece}">${x.name}<small>${inr(piecePrice(p, x.id))}</small></button>`).join('')}</div>
+        <p class="pc-note"><span><b>Size</b>${pc.size}</span><span><b>Includes</b>${pc.inc}</span></p></div>
+    </div>
+    <div class="cta"><div class="qty"><button data-q="-1" aria-label="Fewer">−</button><output>${psel.qty}</output><button data-q="1" aria-label="More">+</button></div>
+      <div class="total"><small>Total</small><b id="total">${inr(piecePrice(p, psel.piece) * psel.qty)}</b></div>
+      <button class="btn" id="addSlip">${editing ? 'Save changes' : 'Add to cart'}</button></div>`;
+  $('#czOpts').querySelectorAll('[data-piece]').forEach(b => b.onclick = () => { psel.piece = b.dataset.piece; renderPair() });
+  $('#czOpts').querySelectorAll('[data-q]').forEach(b => b.onclick = () => { psel.qty = Math.max(1, Math.min(50, psel.qty + +b.dataset.q)); renderPair() });
+  if (slip.length && !editing) $('#toSlip').onclick = showSlip;
+  $('#addSlip').onclick = () => {
+    const line = {kind:'pair', ref:p.id, name: psel.piece === 'pair' ? p.name : `${p.name} · ${pc.name}`, unit:piecePrice(p, psel.piece), qty:psel.qty,
+      details:`${pc.size} · ${pc.inc}`, opts:{piece:psel.piece}};
+    if (editing) slip[psel.edit] = line; else { slip.push(line); track('AddToCart', {value: line.unit * line.qty, currency: 'INR', content_name: line.name}) }
+    saveSlip(); showSlip();
+  };
 }
 // The cart shows the first piece in it (a pair or a candle); an empty cart shows the gift box.
 function openCart(){
@@ -649,21 +774,33 @@ function openCart(){
 }
 $('#cartBtn').onclick = openCart;
 
+// How an order arrives — Everly White packaging, shown with the cart.
+const UNBOX = `<section class="unbox"><div class="lbl">The Everly White unboxing</div>
+  <p>Every order is hand-packed in our signature gift box, wrapped in tissue and sealed with wax.</p>
+  <div class="ub-ph"><img src="assets/brand_packaging-flatlay.jpg" alt="Everly White gift box, cards and wax seal"><img src="assets/cart.jpg" alt="Open Everly White gift box"><img src="assets/pack-seal.webp" alt="Envelope sealed with the Everly White wax seal"></div></section>`;
+// The photo of a cart line (first photo of a pair, the candle's photo).
+const photoOf = x => { const p = x.kind === 'pair' && PAIRS.find(p => p.id === x.ref), c = x.kind === 'candle' && CANDLES.find(c => c.id === x.ref); return p ? `assets/${p.im[0]}.webp` : c ? c.photo : '' };
 function showSlip(){
   $('#czBody').classList.add('slipping'); cz.scrollTop = 0;
+  // Beside the cart: every piece in it, numbered like the list (up to 4, then "+N more").
+  // Beside the cart: the gift box everything arrives in, filling the whole left side.
+  const pvEl = $('#czBody .pv');
+  if (pvEl) pvEl.innerHTML = `<figure class="giftpv"><img src="assets/pack-box.jpg" alt="Everly White gift box and carry bag">
+    <figcaption><div class="lbl">The Everly White unboxing</div><p>Every order is hand-packed in our signature gift box, wrapped in tissue and sealed with wax.</p></figcaption></figure>`;
   if (!slip.length) {
-    $('#czOpts').innerHTML = `<div class="lbl">Your cart</div><h2>Your cart is empty</h2><p class="desc">Add a piece from the collection and it will wait for you here.</p>
+    $('#czOpts').innerHTML = `<h2 class="mycart">My Cart <span>Empty</span></h2><p class="desc">Add a piece from the collection and it will wait for you here.</p>
       <button class="btn more" onclick="cz.close()">Browse the collection</button>`;
     return;
   }
-  $('#czOpts').innerHTML = `<div class="lbl">Your cart</div><h2>${plural(pieces())}</h2>
-    <ol class="slip">${slip.map((x, i) => `<li><span class="no">${String(i + 1).padStart(2, '0')}</span>
+  $('#czOpts').innerHTML = `<h2 class="mycart">My Cart <span>${plural(pieces())}</span></h2><div class="lbl">What you’ll take home</div>
+    <ol class="slip">${slip.map((x, i) => `<li><span class="no">${String(i + 1).padStart(2, '0')}</span><img class="th" src="${photoOf(x)}" alt="">
       <div class="ln"><b>${esc(x.name)}</b><small>${esc(x.details)}</small>
         <div class="la"><div class="qty sm"><button data-i="${i}" data-d="-1" aria-label="Fewer">−</button><output>${x.qty}</output><button data-i="${i}" data-d="1" aria-label="More">+</button></div>
-          ${x.kind === 'candle' ? `<button class="lnk" data-edit="${i}">Edit</button>` : ''}<button class="lnk" data-rm="${i}">Remove</button></div></div>
+          <button class="lnk" data-edit="${i}">Edit</button><button class="lnk" data-rm="${i}">Remove</button></div></div>
       <span class="lp">${inr(x.unit * x.qty)}</span></li>`).join('')}</ol>
     <div class="slip-total"><span>Total</span><b>${inr(slipTotal())}</b></div>
     <button class="btn ghost more" id="more">Continue shopping</button>
+    <div class="unbox-m">${UNBOX}</div>
     <form class="f" id="form" novalidate>
       <label>Name *<input name="name" required autocomplete="name"></label>
       <label>WhatsApp / Phone *<input name="phone" required type="tel" autocomplete="tel" minlength="8"></label>
@@ -693,6 +830,7 @@ function showSlip(){
   $('#czOpts').querySelectorAll('[data-rm]').forEach(b => b.onclick = () => { slip.splice(+b.dataset.rm, 1); saveSlip(); showSlip() });
   $('#czOpts').querySelectorAll('[data-edit]').forEach(b => b.onclick = () => {
     const i = +b.dataset.edit, x = slip[i];
+    if (x.kind === 'pair') return customisePair(PAIRS.find(p => p.id === x.ref), {...x.opts, qty:x.qty}, i);
     customise(CANDLES.find(c => c.id === x.ref) || CANDLES[0], null, {...x.opts, qty:x.qty}, i);
   });
   // Back to the collection: tapping Customise on any candle adds to this same slip (it's saved).
@@ -723,8 +861,8 @@ function invoiceLine(x){
   const p = x.kind === 'pair' && PAIRS.find(p => p.id === x.ref), c = x.kind === 'candle' && CANDLES.find(c => c.id === x.ref);
   const photo = p ? `assets/${p.im[0]}.webp` : c ? c.photo : '';
   return {kind:x.kind, name:x.name, details:x.details, qty:x.qty, unit:x.unit, image: photo && new URL(photo, location.href).href,
-    choices: c ? [['Wax', WAX.find(w => w.id === x.opts?.wax)?.name || ''], ['Colour', colorName(x.opts?.hex)], ['Fragrance', x.opts?.frag || '']]
-               : [['Size', 'Ø 31 cm + Ø 21 cm'], ['Includes', '2 stands, 2 brand cards, gift box']]};
+    choices: c ? [['Set', `Set of ${x.opts?.set || 1}`], ['Wax', WAX.find(w => w.id === x.opts?.wax)?.name || ''], ['Colour', colorName(x.opts?.hex)], ['Fragrance', x.opts?.frag || '']]
+               : [['Piece', pieceOf(x.opts?.piece).name], ['Size', pieceOf(x.opts?.piece).size], ['Includes', pieceOf(x.opts?.piece).inc]]};
 }
 
 async function send(e){
@@ -749,7 +887,8 @@ async function send(e){
   await flush();
   cz.close();
   $('#doneTitle').textContent = `Thank you, ${f.name.trim().split(' ')[0]}`;
-  $('#doneMsg').innerHTML = `We have received your order <b>${req.id}</b>, and we’ll get in touch with you on WhatsApp shortly.<span class="next">Next, we’ll send you a QR code for a small token amount. Once it’s paid, we start making your order.</span>`;
+  $('#doneMsg').innerHTML = `We have received your order <button type="button" class="oid" id="oid" title="Copy order number">${req.id}<span>Copy</span></button>, and we’ll get in touch with you on WhatsApp shortly.<span class="next">Next, we’ll send you a QR code for the full payment. Once it’s paid, we begin making your order by hand.</span>`;
+  $('#oid').onclick = () => { navigator.clipboard?.writeText(req.id).then(() => { $('#oid span').textContent = 'Copied'; setTimeout(() => $('#oid span').textContent = 'Copy', 1600) }, () => {}) };
   showOrdered(slip);
   $('#wa').href = CONFIG.WHATSAPP;
   $('#done').classList.add('on'); $('#done').scrollTop = 0;
@@ -837,7 +976,7 @@ const io = 'IntersectionObserver' in window && new IntersectionObserver(es => es
 document.querySelectorAll('.row').forEach(r => io ? io.observe(r) : r.classList.add('in'));
 
 // a shared link can open straight into a tab: showroom.html#cotu (or #mystic, hidden for now)
-if (/^#(cotu|mystic)$/.test(location.hash)) { go('world'); tab(location.hash.slice(1)) }
+if (/^#(statement|cotu|mystic)$/.test(location.hash)) { go('world'); tab(location.hash.slice(1)) }
 const setHH = () => document.documentElement.style.setProperty('--hh', $('header').offsetHeight + 'px');
 addEventListener('resize', setHH); new ResizeObserver(setHH).observe($('header'));
 saveSlip(); flush();
