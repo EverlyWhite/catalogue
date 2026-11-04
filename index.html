@@ -51,14 +51,24 @@ button{cursor:pointer;border:0;background:none}
 .site{margin-top:22px;font-size:13px;letter-spacing:.12em;color:var(--mute)}
 @media (orientation:landscape) and (min-width:900px){
   .poster{grid-template-rows:none;grid-template-columns:1fr 1fr;height:100dvh}
-  .poster .ph:after{background:linear-gradient(to right,transparent 60%,var(--paper))}
+  .poster .ph{order:2}
+  .poster .ph:after{background:linear-gradient(to left,transparent 60%,var(--paper))}
   .poster .tx{display:flex;flex-direction:column;justify-content:center;padding:40px}
 }
 
 /* ---------- WORLD ---------- */
-header{position:sticky;top:0;z-index:20;background:rgba(255,249,245,.94);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
-  border-bottom:1px solid var(--line);padding-top:env(safe-area-inset-top)}
-.bar{max-width:1240px;margin:0 auto;padding:12px 24px;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:16px}
+/* frosted-glass header, as on everlywhite.com: white at 60%, heavy blur, a faint white edge and a soft shadow */
+header{position:sticky;top:0;z-index:20;background:rgba(255,255,255,.6);backdrop-filter:blur(16px) saturate(1.2);-webkit-backdrop-filter:blur(16px) saturate(1.2);
+  border-bottom:1px solid rgba(255,255,255,.4);box-shadow:0 4px 24px rgba(0,0,0,.06);padding-top:env(safe-area-inset-top)}
+.bar{max-width:1240px;margin:0 auto;padding:8px 24px;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:16px}
+.bar .cart{justify-self:end}
+.cart{position:relative;display:flex;align-items:center;gap:10px;min-height:48px;padding:0 4px;color:var(--brown);font:400 11.5px/1 var(--head);letter-spacing:.18em;text-transform:uppercase}
+.cart svg{width:24px;height:24px}
+.cart b{position:absolute;top:4px;left:14px;min-width:19px;height:19px;padding:0 5px;border-radius:10px;background:var(--brown);color:var(--paper);font:400 10.5px/19px var(--head);letter-spacing:0;text-align:center;transform:scale(0);transition:transform .35s var(--ease)}
+.cart b.on{transform:scale(1)}
+.cart.pulse{animation:pulse .6s var(--ease)}
+@keyframes pulse{40%{transform:scale(1.12)}}
+.btn.added{background:var(--ink);border-color:var(--ink)}
 .bar .logo{height:32px;cursor:pointer}
 .tabs{display:flex;gap:40px}
 .tabs button{position:relative;min-height:48px;padding:0 2px;font:400 12.5px/1 var(--head);letter-spacing:.22em;text-transform:uppercase;color:var(--soft);transition:color .4s}
@@ -66,7 +76,7 @@ header{position:sticky;top:0;z-index:20;background:rgba(255,249,245,.94);backdro
 .tabs button[aria-selected=true]{color:var(--brown)}
 .tabs button[aria-selected=true]:after{transform:scaleX(1)}
 .tabs .new{font-size:8.5px;letter-spacing:.16em;margin-left:8px;padding:3px 6px;background:var(--pink);color:var(--brown);vertical-align:2px}
-@media (max-width:640px){.bar{grid-template-columns:1fr;justify-items:center;padding:10px 16px 0}.bar .logo{height:26px}.tabs{gap:22px}.tabs button{font-size:10.5px;letter-spacing:.12em}}
+@media (max-width:640px){.bar{padding:8px 12px 8px 16px}.cart span{display:none}.bar .logo{height:26px}.tabs{gap:22px}.tabs button{font-size:10.5px;letter-spacing:.12em}}
 
 main{max-width:1240px;margin:0 auto;padding:0 24px calc(60px + env(safe-area-inset-bottom))}
 .panel{display:none}.panel.on{display:block;animation:fade .5s var(--ease)}
@@ -109,6 +119,34 @@ main{max-width:1240px;margin:0 auto;padding:0 24px calc(60px + env(safe-area-ins
   .info{max-width:none;text-align:center}
   .dots{justify-content:center;margin-left:0}
 }
+.banner{position:relative;margin:0 calc(50% - 50vw);height:min(62vh,560px);overflow:hidden}
+.banner img{width:100%;height:100%;object-fit:cover;object-position:50% 40%;animation:drift 18s ease-in-out infinite alternate}
+.banner:after{content:"";position:absolute;inset:0;background:linear-gradient(to bottom,transparent 45%,var(--paper) 96%)}
+.banner .bt{position:absolute;left:0;right:0;bottom:22px;z-index:1;text-align:center;padding:0 20px;transition:opacity .35s}
+.banner .bt.swap{opacity:0}
+/* phones and tablets (narrow screens, or any touch screen such as an iPad in landscape): banner without the one-liner */
+@media (max-width:1024px),(hover:none) and (pointer:coarse){.banner .bt p{display:none}}
+.banner h1{font:300 clamp(36px,5.6vw,62px)/1.05 var(--head);letter-spacing:.02em;margin:10px 0 8px}
+.banner p{color:var(--body);font-style:italic;font-size:19px}
+@media (max-width:640px){.banner{height:48vh}.banner .bt{bottom:8px}}
+/* the two categories live in the header as small-caps links, the active one underlined (as on everlywhite.com) */
+.cats{display:flex;gap:36px}
+.cats button{position:relative;min-height:44px;padding:6px 2px;font:400 11.5px/1 var(--head);letter-spacing:.1em;text-transform:uppercase;color:var(--body);transition:color .3s}
+.cats button:hover{color:var(--brown)}
+.cats button:before{content:"";position:absolute;left:0;right:0;bottom:8px;height:1px;background:var(--brown);transform:scaleX(0);transition:transform .4s var(--ease)}
+.cats button[aria-selected=true]{color:var(--brown);font-weight:500}
+.cats button[aria-selected=true]:before{transform:scaleX(1)}
+.shop{margin-top:8px}
+.shop-main{min-width:0}
+@media (max-width:640px){
+  /* phones: logo and cart on top, the two tabs in a slim row beneath, still inside the one glass header */
+  .bar{display:flex;justify-content:space-between;flex-wrap:wrap;row-gap:0;padding-bottom:2px}
+  .cats{order:3;width:100%;gap:0;margin-top:-4px}
+  .cats button{flex:1;min-height:38px;font-size:11px}
+  .cats button:before{left:28%;right:28%;bottom:4px}
+}
+button:focus:not(:focus-visible){outline:none}
+button:focus-visible{outline:1px solid var(--brown);outline-offset:3px}
 .promo{display:grid;grid-template-columns:220px 1fr auto;gap:32px;align-items:center;background:var(--pink);padding:0 36px 0 0;margin:40px 0 6px;overflow:hidden}
 .promo img{width:220px;height:220px;object-fit:cover;object-position:50% 45%}
 .promo h3{font:300 30px/1.15 var(--head);margin:6px 0 8px}
@@ -122,14 +160,18 @@ main{max-width:1240px;margin:0 auto;padding:0 24px calc(60px + env(safe-area-ins
 /* ---------- sheets ---------- */
 dialog{border:0;padding:0;background:var(--paper);color:var(--ink);width:min(1100px,96vw);max-width:none;max-height:94dvh;margin:auto;overflow:auto;box-shadow:0 30px 80px rgba(30,20,20,.3)}
 dialog[open]{animation:rise .45s var(--ease)}
+/* while a sheet is open the page behind is frozen: no scroll, no scroll bleeding through on iPad/iPhone */
+html:has(dialog[open]){overflow:hidden}
+dialog{overscroll-behavior:contain}
 dialog::backdrop{background:rgba(30,30,30,.4);backdrop-filter:blur(3px)}
 @keyframes rise{from{opacity:0;transform:translateY(24px)}}
 .x{position:absolute;top:10px;right:10px;width:46px;height:46px;background:var(--paper);font-size:24px;z-index:3;color:var(--brown);outline-color:var(--brown)}
 
 /* customise */
 .cz{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
-.cz .pv{background:var(--pink);position:sticky;top:0;align-self:stretch;min-height:100%;max-height:94dvh}
-.cz .pv>*{width:100%;height:100%;object-fit:cover}
+/* the photo is never cropped: a square frame for square product shots, and contain for anything else */
+.cz .pv{background:var(--pink);position:sticky;top:0;align-self:start;aspect-ratio:1;max-height:94dvh}
+.cz .pv>*,.cz .pv .slot>*{width:100%;height:100%;object-fit:contain}
 .cz .pv .sw-name{position:absolute;left:14px;bottom:14px;width:auto;height:auto;background:rgba(255,249,245,.9);padding:6px 12px;font:italic 15px/1 var(--text);color:var(--mute)}
 .cz .opts-col{padding:34px 32px 30px}
 .cz h2{font:300 32px/1.1 var(--head);margin:6px 0 4px}
@@ -197,9 +239,11 @@ form.f{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
 .f input:focus,.f textarea:focus{outline:none;border-color:var(--brown)}
 .f .btn{grid-column:1/-1;margin-top:6px}
 .err{grid-column:1/-1;color:#A3482B;font-size:15px}
+.f label.consent{grid-column:1/-1;flex-direction:row;align-items:flex-start;gap:12px;font:400 16px/1.4 var(--text);letter-spacing:0;text-transform:none;color:var(--body);cursor:pointer}
+.f label.consent input{min-height:0;width:20px;height:20px;margin-top:1px;flex:none;accent-color:var(--brown)}
 @media (max-width:800px){
   dialog{width:100vw;height:100dvh;max-height:none;margin:0}
-  .cz{grid-template-columns:minmax(0,1fr)}.cz .pv{position:relative;aspect-ratio:auto;height:34dvh;min-height:0}
+  .cz{grid-template-columns:minmax(0,1fr)}.cz .pv{position:relative;width:100%;aspect-ratio:1;max-height:56dvh;justify-self:center}
   /* on a phone the slip is a list to read, not a picture to look at: drop the photo, keep the close button clear */
   .cz.slipping .pv{display:none}.cz.slipping .opts-col{padding-top:60px}
   .cta{gap:10px}.cta .btn{padding:0 16px}.cta .qty button{width:42px}
@@ -254,7 +298,6 @@ form.f{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
   .qty.sm button{width:44px;height:44px}
   .lbl{letter-spacing:.14em}
   /* header: logo, then two equal tabs with room to breathe — the tabs used to squeeze and overlap */
-  .bar{padding:8px 16px 0;gap:2px}
   .bar .logo{height:24px}
   .tabs{width:100%;gap:0}
   .tabs button{flex:1;min-height:46px;padding:6px 6px 12px;font-size:11px;letter-spacing:.1em;line-height:1.35;white-space:normal}
@@ -295,24 +338,25 @@ form.f{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
 <section id="world" class="view">
   <header><div class="bar">
     <img class="logo" src="assets/logo.png" alt="Everly White" onclick="go('home')">
-    <nav class="tabs" role="tablist">
-      <button role="tab" aria-selected="true" data-tab="mystic">Mystic Flames<span class="new">New</span></button>
-      <button role="tab" aria-selected="false" data-tab="cotu">Center of the Universe</button>
+    <nav class="cats" role="tablist" aria-label="Collections">
+      <button role="tab" aria-selected="true" data-tab="cotu">Centerpieces</button>
+      <button role="tab" aria-selected="false" data-tab="mystic">Exotic Candles</button>
     </nav>
-    <span></span>
+    <button class="cart" id="cartBtn" aria-label="Cart"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M5 8h14l-1.2 12H6.2zM9 8V6.5a3 3 0 0 1 6 0V8"/></svg><b id="count">0</b><span>Cart</span></button>
   </div></header>
   <main>
-    <div class="panel on" id="p-mystic">
-      <div class="intro-band"><div class="lbl">Candle Atelier · Only at Everly White</div><h1>Mystic Flames</h1><div class="orn"><svg viewBox="0 0 14 14" fill="currentColor"><path d="M7 0l1.4 5.6L14 7l-5.6 1.4L7 14l-1.4-5.6L0 7l5.6-1.4z"/></svg></div>
-        <p>Sculpted candles from moulds you won’t find anywhere else in India. Choose one, make it yours.</p></div>
-      <div id="candles"></div>
-    </div>
-    <div class="panel" id="p-cotu">
-      <div class="intro-band"><div class="lbl">The Debut Collection</div><h1>Center of the Universe</h1><div class="orn"><svg viewBox="0 0 14 14" fill="currentColor"><path d="M7 0l1.4 5.6L14 7l-5.6 1.4L7 14l-1.4-5.6L0 7l5.6-1.4z"/></svg></div>
-        <p>Hand-carved mirror-inlay pairs, made to sit together at the heart of your home.</p></div>
-      <div id="pairs"></div>
-      <div class="promo"><img src="assets/candles/column.jpg" alt=""><div><div class="lbl">New · Mystic Flames</div><h3>Design a candle that’s only yours</h3><p>Rare moulds, your colour, your fragrance, your wax.</p></div>
-        <button class="btn" onclick="tab('mystic')">Explore candles</button></div>
+    <div class="banner"><img src="assets/coll-banner.png" alt="Two hands reaching toward each other beneath a glowing sacred geometry pattern">
+      <div class="bt" id="bannerText"><div class="lbl">The Debut Collection</div><h1>Center of the Universe</h1><p>Hand-carved mirror-inlay pairs, made to sit together at the heart of your home.</p></div></div>
+    <!-- products of the category chosen in the header -->
+    <div class="shop">
+      <div class="shop-main">
+        <div class="panel on" id="p-cotu">
+          <div id="pairs"></div>
+        </div>
+        <div class="panel" id="p-mystic">
+          <div id="candles"></div>
+        </div>
+      </div>
     </div>
     <footer class="sign"><img src="assets/logo.png" alt="Everly White"><p>“What’s meant for you will always find you.”</p>
       <div class="lbl">Handmade in India · everlywhite.com · @everlywhitestudios</div></footer>
@@ -352,6 +396,9 @@ const CONFIG = {
   // Paste the Web App URL from orders.gs (Google Apps Script) here. Until then enquiries stay saved on this device and are sent once it's set.
   SCRIPT_URL: '',
   WHATSAPP: 'https://wa.me/message/OEJJOG6DF762J1',
+  // Ad audiences: paste your IDs to switch these on. Left blank, nothing loads.
+  META_PIXEL_ID: '',     // Meta Events Manager → Data sources → your Pixel ID (digits)
+  GOOGLE_TAG_ID: '',     // Google Ads → Tools → Google tag, e.g. AW-123456789 (or a G-… Analytics ID)
 };
 
 // Your palette. Every candle photo with a mask is repainted in these.
@@ -366,18 +413,33 @@ const FRAGS = ['Sandalwood & Amber','Jasmine Sambac','French Lavender','Vanilla 
 // price: ₹ per candle for each wax — the wax is the one choice that changes the price.
 // ponytail: name, text and PRICES are placeholders until the real mould list and price list are in.
 const CANDLES = [
-  {id:'column', name:'Bloom Column', tag:'Sculpted, ribbed and a little regal.', photo:'assets/candles/column.jpg', mask:'assets/candles/column-mask.png',
-   desc:'Fine vertical ribs wrap a flared crown and rounded beads, catching light like pleated silk. Lovely as a pair on a console or dining table.',
-   price:{soy:1199, paraffin:999}},
   // No mask yet: shown as photographed. Drop the photos in at these paths (any size; square looks best).
-  {id:'heirloom', name:'Heirloom Finial', tag:'Ornate, beaded and made to be kept.', photo:'assets/candles/heirloom.jpg', mask:null,
-   desc:'Floral medallions and beaded bands wrap a rounded body and a flame-shaped crown, like a carved heirloom you light.',
-   price:{soy:1199, paraffin:999}},
   {id:'ripple', name:'Ripple Tower', tag:'Tall, fluted and softly stacked.', photo:'assets/candles/ripple.jpg', mask:null,
    desc:'Deep flutes run from a slender crown down through stacked, rounded tiers, so the light pools in every rib.',
    price:{soy:1199, paraffin:999}},
   {id:'pillar', name:'Crown Pillar', tag:'Tall, fluted and quietly grand.', photo:'assets/candles/pillar.jpg', mask:null,
    desc:'A flared, fluted crown rises over a ringed collar and a rounded bead, then tapers to a fluted base. Striking in a row of three.',
+   price:{soy:1199, paraffin:999}},
+  {id:'minaret', name:'Minaret Drop', tag:'A fluted teardrop on two soft beads.', photo:'assets/candles/minaret.jpg', mask:null,
+   desc:'A tall, fluted teardrop rises from two stacked, ribbed beads, like the spire of a minaret catching evening light.',
+   price:{soy:1199, paraffin:999}},
+  {id:'heirloom', name:'Heirloom Finial', tag:'Ornate, beaded and made to be kept.', photo:'assets/candles/heirloom.jpg', mask:null,
+   desc:'Floral medallions and beaded bands wrap a rounded body and a flame-shaped crown, like a carved heirloom you light.',
+   price:{soy:1199, paraffin:999}},
+  {id:'spire', name:'Temple Spire', tag:'Slender, ringed and reaching upward.', photo:'assets/candles/spire.jpg', mask:null,
+   desc:'A fine spire wrapped in stacked rings crowns a ribbed bulb on a scalloped base, made for altars and pooja spaces.',
+   price:{soy:1199, paraffin:999}},
+  {id:'muse', name:'Hourglass Muse', tag:'Curved, ribbed and gently sculptural.', photo:'assets/candles/muse.jpg', mask:null,
+   desc:'A ribbed hourglass silhouette with a soft, rounded crown, catching light along every curve.',
+   price:{soy:1199, paraffin:999}},
+  {id:'twist', name:'Honeycomb Twist', tag:'A soft knot of honeycomb texture.', photo:'assets/candles/twist.jpg', mask:null,
+   desc:'A twisted taper wrapped in a honeycomb pattern, playful on its own and beautiful in a row of three shades.',
+   price:{soy:1199, paraffin:999}},
+  {id:'amphora', name:'Swirl Amphora', tag:'A swirled vase, cast in wax.', photo:'assets/candles/amphora.jpg', mask:null,
+   desc:'A slender amphora with soft spiral fluting on a carved, turned pedestal, elegant on a console or pooja shelf.',
+   price:{soy:1199, paraffin:999}},
+  {id:'lantern', name:'Lantern Taper', tag:'A tall taper on a ribbed lantern base.', photo:'assets/candles/lantern.jpg', mask:null,
+   desc:'A slim, fluted taper rises from a rounded, ribbed base, beautiful grouped in mixed heights and shades down a dining table.',
    price:{soy:1199, paraffin:999}},
 ];
 
@@ -403,10 +465,21 @@ const store = {
   set(k, v){ try{ localStorage.setItem(k, JSON.stringify(v)) }catch{} },
 };
 function go(v){ document.querySelectorAll('.view').forEach(e => e.classList.toggle('on', e.id === v)); scrollTo(0,0) }
+// Banner words for each category; the text fades across when the tab changes.
+const BANNER = {
+  cotu: ['The Debut Collection', 'Center of the Universe', 'Hand-carved mirror-inlay pairs, made to sit together at the heart of your home.'],
+  mystic: ['The Candle Atelier', 'Mystic Flames', 'Sculpted candles from rare moulds, poured by hand in your colour, wax and fragrance.'],
+};
 function tab(t){
+  const bt = $('#bannerText'), [l, h, p] = BANNER[t];
+  if (bt.querySelector('h1').textContent !== h) {
+    bt.classList.add('swap');
+    setTimeout(() => { bt.querySelector('.lbl').textContent = l; bt.querySelector('h1').textContent = h; bt.querySelector('p').textContent = p; bt.classList.remove('swap') }, 350);
+  }
   document.querySelectorAll('[data-tab]').forEach(x => x.setAttribute('aria-selected', x.dataset.tab === t));
   document.querySelectorAll('.panel').forEach(p => p.classList.toggle('on', p.id === 'p-' + t));
-  scrollTo({top:0, behavior:'smooth'});
+  const top = $('.shop').getBoundingClientRect().top + scrollY - (parseInt(getComputedStyle(document.documentElement).getPropertyValue('--hh')) || 0) - 8;
+  if (scrollY > top) scrollTo({top, behavior:'smooth'});
 }
 document.querySelectorAll('[data-tab]').forEach(b => b.onclick = () => tab(b.dataset.tab));
 
@@ -475,13 +548,13 @@ $('#pairs').innerHTML = PAIRS.map((p, i) => `<section class="row" data-p="${i}">
   <div class="main"><img src="assets/${p.im[0]}.webp" alt="${esc(p.name)}" loading="lazy"></div>
   <div class="info"><div class="lbl">${p.id}</div><h2>${esc(p.name)}</h2><div class="tag">${esc(p.tag)}</div>
     <div class="price">${inr(p.price)}</div>
-    <div class="acts"><button class="btn ghost" data-photos>View photos</button><button class="btn" data-order>Place an order</button></div></div>
+    <div class="acts"><button class="btn ghost" data-photos>View photos</button><button class="btn" data-order>Add to cart</button></div></div>
 </section>`).join('');
 
 document.querySelectorAll('#pairs .row').forEach(row => {
   const p = PAIRS[row.dataset.p];
   row.querySelector('[data-photos]').onclick = () => openPhotos(p.im.map(n => `<img src="assets/${n}.webp" alt="">`));
-  row.querySelector('[data-order]').onclick = () => orderPair(p);
+  row.querySelector('[data-order]').onclick = e => addPair(p, e.currentTarget);
 });
 
 /* ===== photos ===== */
@@ -501,7 +574,10 @@ let sel;
    is kept on this device, so closing the sheet midway loses nothing. One "Place order" sends it all. */
 let slip = store.get('ew-slip', []);
 let draft = {};   // the details form, kept while the customer goes off to add or edit a piece
-const saveSlip = () => store.set('ew-slip', slip);
+const saveSlip = () => {
+  store.set('ew-slip', slip);
+  const n = pieces(); $('#count').textContent = n; $('#count').classList.toggle('on', n > 0);
+};
 const slipTotal = () => slip.reduce((a, x) => a + x.unit * x.qty, 0);
 const pieces = () => slip.reduce((a, x) => a + x.qty, 0);
 const plural = n => `${n} piece${n === 1 ? '' : 's'}`;
@@ -518,12 +594,12 @@ function customise(c, hex, opts, edit){
   openSheet('<div class="slot" style="width:100%;height:100%"></div>');
   renderOpts();
 }
-function pv(){ show($('#czBody .pv .slot'), sel.c, sel.hex); $('#czBody .sw-name').textContent = `${sel.c.name} in ${colorName(sel.hex)}` }
+function pv(){ show($('#czBody .pv .slot'), sel.c, sel.hex); $('#czBody .sw-name').textContent = sel.c.mask ? `${sel.c.name} in ${colorName(sel.hex)}` : sel.c.name }
 // Price of one candle as chosen — set by the wax.
 const unitPrice = () => sel.c.price[sel.wax];
 function renderOpts(){
   const c = sel.c, editing = sel.edit != null;
-  $('#czOpts').innerHTML = `${slip.length && !editing ? `<button class="slipnote" id="toSlip">Your order slip · ${plural(pieces())}<span>View →</span></button>` : ''}
+  $('#czOpts').innerHTML = `${slip.length && !editing ? `<button class="slipnote" id="toSlip">Your cart · ${plural(pieces())}<span>View →</span></button>` : ''}
     <div class="lbl">${editing ? 'Change this piece' : 'Customise'}</div><h2>${esc(c.name)}</h2><div class="sub">${esc(c.tag)}</div><p class="desc">${esc(c.desc)}</p>
     <div class="pick">
       <label class="w">1 · Wax<select data-k="wax">${WAX.map(w => `<option value="${w.id}" ${w.id === sel.wax ? 'selected' : ''}>${w.name} — ${inr(c.price[w.id])}</option>`).join('')}</select></label>
@@ -532,7 +608,7 @@ function renderOpts(){
     </div>
     <div class="cta"><div class="qty"><button data-q="-1" aria-label="Fewer">−</button><output>${sel.qty}</output><button data-q="1" aria-label="More">+</button></div>
       <div class="total"><small>Total</small><b id="total"></b></div>
-      <button class="btn" id="addSlip">${editing ? 'Save changes' : slip.length ? 'Add to order' : 'Continue'}</button></div>`;
+      <button class="btn" id="addSlip">${editing ? 'Save changes' : 'Add to cart'}</button></div>`;
   const total = () => $('#total').textContent = inr(unitPrice() * sel.qty);
   total();
   // Dropdowns update the choice in place; only colour changes the preview.
@@ -543,30 +619,43 @@ function renderOpts(){
     const line = {kind:'candle', ref:c.id, name:`${c.name} candle`, unit:unitPrice(), qty:sel.qty,
       details:`${WAX.find(w => w.id === sel.wax).name} · ${colorName(sel.hex)} · ${sel.frag}`,
       opts:{wax:sel.wax, hex:sel.hex, frag:sel.frag}};
-    if (editing) slip[sel.edit] = line; else slip.push(line);
+    if (editing) slip[sel.edit] = line; else { slip.push(line); track('AddToCart', {value: line.unit * line.qty, currency: 'INR', content_name: line.name}) }
     saveSlip(); showSlip();
   };
   pv();
 }
-function orderPair(p){
-  openSheet(`<img src="assets/${p.im[0]}.webp" alt="">`);
+// Adds a pair to the cart and stays on the page; the header count shows it landed.
+function addPair(p, btn){
   const same = slip.find(x => x.ref === p.id);
   if (same) same.qty++;
   else slip.push({kind:'pair', ref:p.id, name:p.name, unit:p.price, qty:1, details:'Pair · Ø 31 + 21 cm · stands, cards & gift box'});
-  saveSlip(); showSlip();
+  saveSlip(); track('AddToCart', {value: p.price, currency: 'INR', content_name: p.name});
+  const c = $('#cartBtn'); c.classList.remove('pulse'); void c.offsetWidth; c.classList.add('pulse');
+  btn.textContent = 'Added ✓'; btn.classList.add('added');
+  setTimeout(() => { btn.textContent = 'Add to cart'; btn.classList.remove('added') }, 1600);
 }
+function openCart(){
+  const x = slip[0], p = x && PAIRS.find(p => p.id === x.ref);
+  openSheet(p ? `<img src="assets/${p.im[0]}.webp" alt="">` : '<img src="assets/coll-banner.png" alt="">');
+  showSlip();
+}
+$('#cartBtn').onclick = openCart;
 
 function showSlip(){
-  if (!slip.length) { cz.close(); return }
   $('#czBody').classList.add('slipping'); cz.scrollTop = 0;
-  $('#czOpts').innerHTML = `<div class="lbl">Your order slip</div><h2>${plural(pieces())}</h2>
+  if (!slip.length) {
+    $('#czOpts').innerHTML = `<div class="lbl">Your cart</div><h2>Your cart is empty</h2><p class="desc">Add a pair from the collection and it will wait for you here.</p>
+      <button class="btn more" onclick="cz.close()">Browse the collection</button>`;
+    return;
+  }
+  $('#czOpts').innerHTML = `<div class="lbl">Your cart</div><h2>${plural(pieces())}</h2>
     <ol class="slip">${slip.map((x, i) => `<li><span class="no">${String(i + 1).padStart(2, '0')}</span>
       <div class="ln"><b>${esc(x.name)}</b><small>${esc(x.details)}</small>
         <div class="la"><div class="qty sm"><button data-i="${i}" data-d="-1" aria-label="Fewer">−</button><output>${x.qty}</output><button data-i="${i}" data-d="1" aria-label="More">+</button></div>
           ${x.kind === 'candle' ? `<button class="lnk" data-edit="${i}">Edit</button>` : ''}<button class="lnk" data-rm="${i}">Remove</button></div></div>
       <span class="lp">${inr(x.unit * x.qty)}</span></li>`).join('')}</ol>
     <div class="slip-total"><span>Total</span><b>${inr(slipTotal())}</b></div>
-    <button class="btn ghost more" id="more">＋ Add another candle</button>
+    <button class="btn ghost more" id="more">Continue shopping</button>
     <form class="f" id="form" novalidate>
       <label>Name *<input name="name" required autocomplete="name"></label>
       <label>WhatsApp / Phone *<input name="phone" required type="tel" autocomplete="tel" minlength="8"></label>
@@ -574,6 +663,7 @@ function showSlip(){
       <label>Email<input name="email" type="email" autocomplete="email" placeholder="for your confirmation"></label>
       <label class="w">Delivery address *<textarea name="address" rows="3" required autocomplete="street-address" placeholder="House, street, area, city, PIN code"></textarea></label>
       <label class="w">Anything else?<textarea name="notes" rows="2" placeholder="Gifting, a date, a colour you have in mind…"></textarea></label>
+      <label class="consent"><input type="checkbox" name="marketing" value="yes">Keep me posted on new collections and offers from Everly White.</label>
       <div class="cta w" style="grid-column:1/-1"><p class="formmsg" id="formMsg" role="alert"></p><button class="btn off" id="send" aria-disabled="true">Place order · ${inr(slipTotal())}</button></div>
     </form>`;
   const form = $('#form');
@@ -619,6 +709,16 @@ addEventListener('online', flush);
 const isFilled = el => el.name === 'phone' ? el.value.replace(/\D/g, '').length >= 8 : !!el.value.trim();
 const missing = form => ['name', 'phone', 'address'].map(n => form.elements[n]).filter(el => !isFilled(el));
 
+// One cart line as the studio's invoice needs it: the photo (full web address, so the email can show it),
+// quantity, price and every choice the customer made.
+function invoiceLine(x){
+  const p = x.kind === 'pair' && PAIRS.find(p => p.id === x.ref), c = x.kind === 'candle' && CANDLES.find(c => c.id === x.ref);
+  const photo = p ? `assets/${p.im[0]}.webp` : c ? c.photo : '';
+  return {kind:x.kind, name:x.name, details:x.details, qty:x.qty, unit:x.unit, image: photo && new URL(photo, location.href).href,
+    choices: c ? [['Wax', WAX.find(w => w.id === x.opts?.wax)?.name || ''], ['Colour', colorName(x.opts?.hex)], ['Fragrance', x.opts?.frag || '']]
+               : [['Size', 'Ø 31 cm + Ø 21 cm'], ['Includes', '2 stands, 2 brand cards, gift box']]};
+}
+
 async function send(e){
   e.preventDefault();
   const gaps = missing(e.target);
@@ -632,10 +732,11 @@ async function send(e){
   const req = {
     id: 'EW-' + d.toISOString().slice(2,10).replace(/-/g,'') + '-' + Math.random().toString(36).slice(2,6).toUpperCase(),
     createdAt: d.toISOString(), customer: f, source: SRC.source,
-    items: slip.map(({kind, name, details, qty, unit}) => ({kind, name, details, qty, unit})),
+    items: slip.map(invoiceLine),
     estimate: slipTotal(), quoted: false,
   };
   store.set('ew-outbox', [...store.get('ew-outbox', []), req]);
+  track('Purchase', {value: req.estimate, currency: 'INR', num_items: pieces()});
   $('#send').disabled = true;
   await flush();
   cz.close();
@@ -698,13 +799,40 @@ function confetti(){
 
 function finish(){ $('#done').classList.remove('on'); go('world') }
 
+// Meta Pixel and Google tag, loaded only when their IDs are set in CONFIG. They build the "visited / added to cart /
+// ordered" audiences for retargeting ads. track() is safe to call either way.
+if (CONFIG.META_PIXEL_ID) {
+  !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+  if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];
+  s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');
+  fbq('init', CONFIG.META_PIXEL_ID); fbq('track', 'PageView');
+}
+if (CONFIG.GOOGLE_TAG_ID) {
+  const g = document.createElement('script'); g.async = true; g.src = 'https://www.googletagmanager.com/gtag/js?id=' + CONFIG.GOOGLE_TAG_ID; document.head.append(g);
+  window.dataLayer = window.dataLayer || []; window.gtag = function(){ dataLayer.push(arguments) }; gtag('js', new Date()); gtag('config', CONFIG.GOOGLE_TAG_ID);
+}
+function track(ev, data){
+  try { window.fbq?.('track', ev, data); window.gtag?.('event', {AddToCart:'add_to_cart', Purchase:'purchase'}[ev], data) } catch {}
+}
+
+// Freeze the page behind any open sheet: pin it in place (older iPad/iPhone Safari ignores overflow:hidden),
+// then put it back exactly where it was when the sheet closes.
+let lockY = 0;
+new MutationObserver(() => {
+  const open = !!document.querySelector('dialog[open]'), b = document.body.style;
+  if (open && !b.position) { lockY = scrollY; Object.assign(b, {position:'fixed', top:-lockY + 'px', left:'0', right:'0'}) }
+  else if (!open && b.position) { Object.assign(b, {position:'', top:'', left:'', right:''}); scrollTo(0, lockY) }
+}).observe(document.body, {subtree:true, attributes:true, attributeFilter:['open']});
+
 // rows drift in as they scroll into view
 const io = 'IntersectionObserver' in window && new IntersectionObserver(es => es.forEach(e => e.isIntersecting && (e.target.classList.add('in'), io.unobserve(e.target))), {threshold:.12});
 document.querySelectorAll('.row').forEach(r => io ? io.observe(r) : r.classList.add('in'));
 
-// a shared link can open straight into a tab: showroom.html#mystic or #cotu
+// a shared link can open straight into a tab: showroom.html#cotu (or #mystic, hidden for now)
 if (/^#(cotu|mystic)$/.test(location.hash)) { go('world'); tab(location.hash.slice(1)) }
-flush();
+const setHH = () => document.documentElement.style.setProperty('--hh', $('header').offsetHeight + 'px');
+addEventListener('resize', setHH); new ResizeObserver(setHH).observe($('header'));
+saveSlip(); flush();
 </script>
 </body>
 </html>
