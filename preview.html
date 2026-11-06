@@ -874,10 +874,10 @@ function showSlip(){
     <button class="btn ghost more" id="more">Continue shopping</button>
     <div class="unbox-m">${UNBOX}</div>
     <form class="f" id="form" novalidate>
-      <label>Name *<input name="name" required autocomplete="name"></label>
-      <label>WhatsApp / Phone *<input name="phone" required type="tel" autocomplete="tel" minlength="8"></label>
+      <label>Name *<input name="name" required autocomplete="name" maxlength="80"></label>
+      <label>WhatsApp number *<input name="phone" required type="tel" inputmode="tel" autocomplete="tel" maxlength="16" placeholder="10-digit mobile number"></label>
       <label>Instagram handle<input name="instagram" placeholder="@" autocapitalize="off"></label>
-      <label>Email<input name="email" type="email" autocomplete="email" placeholder="for your invoice, once paid"></label>
+      <label>Email *<input name="email" type="email" required autocomplete="email" placeholder="your invoice is sent here"></label>
       <label class="w">Delivery address *<textarea name="address" rows="3" required autocomplete="street-address" placeholder="House, street, area, city, PIN code"></textarea></label>
       <label class="w">Anything else?<textarea name="notes" rows="2" placeholder="Gifting, a date, a colour you have in mind…"></textarea></label>
       <label class="consent"><input type="checkbox" name="marketing" value="yes">Keep me posted on new collections and offers from Everly White (by WhatsApp, email and Instagram / Google ads).</label>
@@ -890,7 +890,7 @@ function showSlip(){
   if (KIOSK) form.querySelectorAll('input,textarea').forEach(el => el.setAttribute('autocomplete', 'off'));
   for (const [k, v] of Object.entries(draft)) if (form[k] && k !== 'marketing' && k !== 'hp_note') form[k].value = v;
   if (draft.marketing) form.marketing.checked = true;
-  // Place order looks off (light brown) until name, WhatsApp number and delivery address are filled in.
+  // Place order looks off (light brown) until name, WhatsApp number, email and delivery address are filled in.
   // It stays tappable: a tap on an incomplete form says what's missing instead of doing nothing.
   form.oninput = () => {
     draft = Object.fromEntries(new FormData(form));
@@ -938,9 +938,17 @@ function flush(){
 }
 addEventListener('online', flush);
 
-// The three things an order can't go without. A phone number needs at least 8 digits.
-const isFilled = el => el.name === 'phone' ? el.value.replace(/\D/g, '').length >= 8 : !!el.value.trim();
-const missing = form => ['name', 'phone', 'address'].map(n => form.elements[n]).filter(el => !isFilled(el));
+// The four things an order can't go without, checked by the same rules as orders.gs:
+// a name with at least two letters; an Indian mobile number (10 digits starting 6–9, with or without +91 / 91 / 0,
+// spaces or dashes); one plain email address (the invoice is sent there once the order is paid); an address.
+const EMAIL_OK = /^[^\s@,;:<>()[\]"'\\]+@[a-z0-9-]+(\.[a-z0-9-]+)*\.[a-z]{2,}$/i;
+const mobileOk = v => /^(?:91|0)?[6-9]\d{9}$/.test(v.replace(/[\s()+-]/g, '')) && !/[^\d\s()+-]/.test(v);
+const isFilled = el => ({
+  name: v => (v.match(/\p{L}/gu) || []).length >= 2,
+  phone: mobileOk,
+  email: v => EMAIL_OK.test(v.trim()),
+})[el.name]?.(el.value) ?? !!el.value.trim();
+const missing = form => ['name', 'phone', 'email', 'address'].map(n => form.elements[n]).filter(el => !isFilled(el));
 
 // One cart line as sent to the studio. orders.gs rebuilds name and price from kind + ref + opts and ignores the rest;
 // name, details, unit, image and choices are still sent so a not-yet-updated orders.gs keeps working.
@@ -958,7 +966,8 @@ async function send(e){
   const gaps = missing(e.target);
   if (gaps.length) {
     gaps.forEach(el => el.setAttribute('aria-invalid', 'true'));
-    $('#formMsg').textContent = 'Please fill in your name, WhatsApp number and delivery address to place your order.';
+    const what = {name: 'your name', phone: 'a valid 10-digit WhatsApp number', email: 'a valid email address (your invoice is sent there)', address: 'your delivery address'};
+    $('#formMsg').textContent = 'Please add ' + gaps.map(el => what[el.name]).join(', ').replace(/, ([^,]*)$/, ' and $1') + '.';
     gaps[0].focus();
     return;
   }
