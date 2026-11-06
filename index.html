@@ -294,6 +294,16 @@ form.f{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
 .f label.consent input{min-height:0;width:20px;height:20px;margin-top:1px;flex:none;accent-color:var(--brown)}
 .f .privacy{grid-column:1/-1;font-size:14.5px;line-height:1.45;color:var(--mute)}
 .f .hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+/* grid cells may shrink below an input's built-in width: without this the form ran off the right edge on iPad */
+.f label{min-width:0}.f input,.f textarea{width:100%;min-width:0}
+/* iPad held upright (744–900pt): half the sheet was a photo and the cart was squeezed into the other half.
+   The cart becomes one roomy column, with the unboxing photos inside it, like on a phone. */
+@media (orientation:portrait) and (min-width:741px) and (max-width:900px){
+  .cz.slipping{grid-template-columns:minmax(0,1fr)}
+  .cz.slipping .pv{display:none}
+  .cz.slipping .opts-col{padding:56px 40px 0}
+  .cz.slipping .unbox-m{display:block}
+}
 @media (max-width:800px){
   dialog{width:100vw;height:100dvh;max-height:none;margin:0}
   .cz{grid-template-columns:minmax(0,1fr)}.cz .pv{position:relative;width:100%;aspect-ratio:1;max-height:56dvh;justify-self:center}
