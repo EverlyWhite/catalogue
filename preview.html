@@ -1071,7 +1071,11 @@ async function backFromRazorpay(id){
   $('#pay').hidden = true; $('.ordered').hidden = true; $('#steps').classList.remove('paid');
   $('#done').classList.add('on'); $('#done').scrollTop = 0;
   const state = saved && saved.id === id && /^[a-f0-9]{32}$/.test(saved.t) ? await payFlow(id, saved.t, true) : 'unknown';
-  if (state === 'paid') { paidView(id, first, !!saved.m); confetti() }
+  if (state === 'paid') {
+    paidView(id, first, !!saved.m); confetti();
+    // the invoice emails go out now (not at the studio's next 5-minute check); the page doesn't wait for them
+    fetch(`${CONFIG.SCRIPT_URL}?pay=${encodeURIComponent(id)}&t=${saved.t}&mail=1`, {cache: 'no-store', credentials: 'omit', keepalive: true}).catch(() => {});
+  }
   else {
     $('#doneMsg').innerHTML = `Thank you! We’re still confirming the payment for order <b>${esc(id)}</b>. Once it’s confirmed, we’ll email your invoice and message you on WhatsApp.`;
     $('#payStepNote').textContent = 'Being confirmed';
