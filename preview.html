@@ -877,7 +877,7 @@ function showSlip(){
       <label>Name *<input name="name" required autocomplete="name"></label>
       <label>WhatsApp / Phone *<input name="phone" required type="tel" autocomplete="tel" minlength="8"></label>
       <label>Instagram handle<input name="instagram" placeholder="@" autocapitalize="off"></label>
-      <label>Email<input name="email" type="email" autocomplete="email" placeholder="for your confirmation"></label>
+      <label>Email<input name="email" type="email" autocomplete="email" placeholder="for your invoice, once paid"></label>
       <label class="w">Delivery address *<textarea name="address" rows="3" required autocomplete="street-address" placeholder="House, street, area, city, PIN code"></textarea></label>
       <label class="w">Anything else?<textarea name="notes" rows="2" placeholder="Gifting, a date, a colour you have in mind…"></textarea></label>
       <label class="consent"><input type="checkbox" name="marketing" value="yes">Keep me posted on new collections and offers from Everly White (by WhatsApp, email and Instagram / Google ads).</label>
@@ -971,7 +971,7 @@ async function send(e){
     items: slip.map(invoiceLine),
   };
   store.set('ew-outbox', [...outbox(), req]);
-  store.set('ew-pay', {id: req.id, t: token});
+  store.set('ew-pay', {id: req.id, t: token, m: !!(f.email || '').trim()});
   track('Purchase', {value: slipTotal(), currency: 'INR', num_items: pieces()});
   $('#send').disabled = true; $('#send').textContent = 'Placing your order…';
   // The order is already saved on this device and goes out in the background (and again later if it must),
@@ -989,7 +989,7 @@ async function send(e){
   const state = await payFlow(req.id, token, false);
   // celebrate only what's done: the payment, or (when payments aren't on) the order itself
   if (state === 'off' || state === 'nolink') { doneText(req.id, 'qr', first); confetti() }
-  if (state === 'paid') { paidView(req.id, first); confetti() }
+  if (state === 'paid') { paidView(req.id, first, !!(f.email || '').trim()); confetti() }
 }
 
 // The words under "Thank you": paying here by Razorpay, or the QR on WhatsApp (when payments aren't switched on).
@@ -1031,23 +1031,23 @@ async function payFlow(id, t, untilPaid){
     if (r.state === 'off' || r.state === 'nolink') return r.state;
     if (r.state === 'ready' && RZP_URL.test(r.url) && !untilPaid) {
       btn.href = r.url; btn.textContent = `Pay ${inr(Number(r.amount) || 0)} securely`; btn.hidden = false; btn.classList.remove('wait');
-      note.textContent = 'UPI, cards or netbanking, secured by Razorpay. We’ve also sent this link to your phone by SMS.';
+      note.textContent = 'UPI, cards or netbanking, secured by Razorpay.';
       return 'ready';
     }
     await wait(1500);
   }
-  if (!untilPaid) { btn.hidden = true; note.textContent = 'Your secure payment link is on its way to your phone by SMS (and email, if you gave one).' }
+  if (!untilPaid) { btn.hidden = true; note.textContent = 'This is taking longer than usual. We’ll send you your payment link on WhatsApp shortly.' }
   return 'slow';
 }
 
 // The page Razorpay brings the customer back to: the payment is confirmed with the studio (which asks Razorpay
 // itself) before it says "received". The address alone proves nothing: anyone could type ?paid=… .
-function paidView(id, first){
+function paidView(id, first, mailed){
   $('#doneTitle').textContent = 'Thank you' + (first ? ', ' + first : '');
   $('.seal').removeAttribute('hidden');
   $('#explore').classList.remove('ghost'); $('#explore').textContent = 'Explore more';
   $('#doneState').textContent = 'Payment received';
-  $('#doneMsg').innerHTML = `Your payment for order <b>${esc(id)}</b> is received.<span class="next">We now begin making your order by hand, and we’ll keep you posted on WhatsApp.</span>`;
+  $('#doneMsg').innerHTML = `Your payment for order <b>${esc(id)}</b> is received.<span class="next">${mailed ? 'Your invoice is on its way to your email. ' : ''}We now begin making your order by hand, and we’ll keep you posted on WhatsApp.</span>`;
   $('#payStep').textContent = 'Paid'; $('#payStepNote').textContent = 'Confirmed by Razorpay';
   const li = $('#steps').children; li[1].className = 'ok'; li[2].className = 'now'; $('#steps').classList.add('paid');
   $('#pay').hidden = true;
@@ -1061,7 +1061,7 @@ async function backFromRazorpay(id){
   $('#pay').hidden = true; $('.ordered').hidden = true; $('#steps').classList.remove('paid');
   $('#done').classList.add('on'); $('#done').scrollTop = 0;
   const state = saved && saved.id === id && /^[a-f0-9]{32}$/.test(saved.t) ? await payFlow(id, saved.t, true) : 'unknown';
-  if (state === 'paid') { paidView(id); confetti() }
+  if (state === 'paid') { paidView(id, '', !!saved.m); confetti() }
   else $('#doneMsg').innerHTML = `Thank you! Razorpay will send your receipt for order <b>${esc(id)}</b>, and we’ll confirm on WhatsApp shortly.`;
 }
 if (PAID && CONFIG.PAY && CONFIG.SCRIPT_URL) backFromRazorpay(PAID);
