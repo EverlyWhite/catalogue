@@ -293,8 +293,6 @@ form.f{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
 .f input:focus,.f textarea:focus{outline:none;border-color:var(--brown)}
 .f .btn{grid-column:1/-1;margin-top:6px}
 .err{grid-column:1/-1;color:#A3482B;font-size:15px}
-.f label.consent{grid-column:1/-1;flex-direction:row;align-items:flex-start;gap:12px;font:400 16px/1.4 var(--text);letter-spacing:0;text-transform:none;color:var(--body);cursor:pointer}
-.f label.consent input{min-height:0;width:20px;height:20px;margin-top:1px;flex:none;accent-color:var(--brown)}
 .f .privacy{grid-column:1/-1;font-size:14.5px;line-height:1.45;color:var(--mute)}
 .f .hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
 /* grid cells may shrink below an input's built-in width: without this the form ran off the right edge on iPad */
@@ -849,7 +847,7 @@ $('#cartBtn').onclick = openCart;
 
 // How an order arrives — Everly White packaging, shown with the cart.
 const UNBOX = `<section class="unbox"><div class="lbl">The Everly White unboxing</div>
-  <p>Every order is hand-packed in our signature gift box, wrapped in tissue and sealed with wax.</p>
+  <p>Every order is hand-packed with care, wrapped in tissue and sealed with wax. Pairs arrive in our signature gift box.</p>
   <div class="ub-ph"><img src="assets/brand_packaging-flatlay.jpg" alt="Everly White gift box, cards and wax seal"><img src="assets/cart.jpg" alt="Open Everly White gift box"><img src="assets/pack-seal.webp" alt="Envelope sealed with the Everly White wax seal"></div></section>`;
 // The photo of a cart line (first photo of a pair, the candle's photo).
 const photoOf = x => { const p = x.kind === 'pair' && PAIRS.find(p => p.id === x.ref), c = x.kind === 'candle' && CANDLES.find(c => c.id === x.ref); return p ? `assets/${p.im[0]}.webp` : c ? c.photo : '' };
@@ -859,7 +857,7 @@ function showSlip(){
   // Beside the cart: the gift box everything arrives in, filling the whole left side.
   const pvEl = $('#czBody .pv');
   if (pvEl) pvEl.innerHTML = `<figure class="giftpv"><img src="assets/pack-box.jpg" alt="Everly White gift box and carry bag">
-    <figcaption><div class="lbl">The Everly White unboxing</div><p>Every order is hand-packed in our signature gift box, wrapped in tissue and sealed with wax.</p></figcaption></figure>`;
+    <figcaption><div class="lbl">The Everly White unboxing</div><p>Every order is hand-packed with care, wrapped in tissue and sealed with wax. Pairs arrive in our signature gift box.</p></figcaption></figure>`;
   if (!slip.length) {
     $('#czOpts').innerHTML = `<h2 class="mycart">My Cart <span>Empty</span></h2><p class="desc">Add a piece from the collection and it will wait for you here.</p>
       <button class="btn more" onclick="cz.close()">Browse the collection</button>`;
@@ -880,8 +878,7 @@ function showSlip(){
       <label>Instagram handle<input name="instagram" placeholder="@" autocapitalize="off"></label>
       <label>Email *<input name="email" type="email" required autocomplete="email" placeholder="your invoice is sent here"></label>
       <label class="w">Delivery address *<textarea name="address" rows="3" required autocomplete="street-address" placeholder="House, street, area, city, PIN code"></textarea></label>
-      <label class="w">Anything else?<textarea name="notes" rows="2" placeholder="Gifting, a date, a colour you have in mind…"></textarea></label>
-      <label class="consent"><input type="checkbox" name="marketing" value="yes">Keep me posted on new collections and offers from Everly White (by WhatsApp, email and Instagram / Google ads).</label>
+      <label class="w">Notes<textarea name="notes" rows="2" placeholder="Gifting, a date, a colour you have in mind…"></textarea></label>
       <p class="privacy">Your details are used only to make, deliver and follow up on this order, and are kept privately by Everly White. We never sell them. Message us on WhatsApp any time to see, correct or delete them, or to stop hearing from us.</p>
       <label class="hp" aria-hidden="true">Leave this empty<input name="hp_note" tabindex="-1" autocomplete="off"></label>
       <div class="cta w" style="grid-column:1/-1"><p class="formmsg" id="formMsg" role="alert"></p><button class="btn off" id="send" aria-disabled="true">Place order · ${inr(slipTotal())}</button></div>
@@ -889,8 +886,7 @@ function showSlip(){
   const form = $('#form');
   // the shop iPad must not offer one customer's details to the next
   if (KIOSK) form.querySelectorAll('input,textarea').forEach(el => el.setAttribute('autocomplete', 'off'));
-  for (const [k, v] of Object.entries(draft)) if (form[k] && k !== 'marketing' && k !== 'hp_note') form[k].value = v;
-  if (draft.marketing) form.marketing.checked = true;
+  for (const [k, v] of Object.entries(draft)) if (form[k] && k !== 'hp_note') form[k].value = v;
   // Place order looks off (light brown) until name, WhatsApp number, email and delivery address are filled in.
   // It stays tappable: a tap on an incomplete form says what's missing instead of doing nothing.
   form.oninput = () => {
