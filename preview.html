@@ -976,7 +976,7 @@ async function send(e){
   $('#send').disabled = true; $('#send').textContent = 'Placing your order…';
   // The order is already saved on this device and goes out in the background (and again later if it must),
   // so the customer waits at most a few seconds, never for the whole invoice to be made.
-  await Promise.race([flush(), new Promise(ok => setTimeout(ok, 3000))]);
+  await Promise.race([flush(), new Promise(ok => setTimeout(ok, 1200))]);
   cz.close();
   const first = f.name.trim().split(' ')[0];
   doneText(req.id, CONFIG.PAY ? 'pay' : 'qr', first);
@@ -984,8 +984,8 @@ async function send(e){
   $('#done').classList.add('on'); $('#done').scrollTop = 0; $('#doneTitle').focus({preventScroll:true});
   slip = []; saveSlip(); draft = {};
   if (!CONFIG.PAY) return confetti();
-  // The order is on its way (or waiting on this device); ask the studio for its Razorpay link until it's there.
-  await flush();
+  // Ask for the Razorpay link straight away: the studio makes it the moment the order arrives, before the invoice
+  // and emails, so there's no need to wait for the whole send to finish.
   const state = await payFlow(req.id, token, false);
   // celebrate only what's done: the payment, or (when payments aren't on) the order itself
   if (state === 'off' || state === 'nolink') { doneText(req.id, 'qr', first); confetti() }
@@ -1010,7 +1010,7 @@ function doneText(id, how, first){
   $('#pay').hidden = how !== 'pay';
 }
 
-// Asks the studio (orders.gs) for this order's payment link, every 3 seconds for up to 90.
+// Asks the studio (orders.gs) for this order's payment link, every 1.5 seconds for up to 90.
 // Returns 'ready' (button shown), 'paid', 'off' (payments not switched on), 'nolink' (Razorpay couldn't make one) or 'slow'.
 // untilPaid: back from Razorpay, keep asking (and have the studio check with Razorpay) until it says paid.
 const RZP_URL = /^https:\/\/(rzp\.io|([a-z0-9-]+\.)*razorpay\.com)\//;
@@ -1018,12 +1018,12 @@ async function payFlow(id, t, untilPaid){
   const btn = $('#payBtn'), note = $('#payNote'), wait = ms => new Promise(ok => setTimeout(ok, ms));
   if (!untilPaid) { $('#pay').hidden = false; btn.hidden = false; btn.classList.add('wait'); btn.removeAttribute('href'); btn.textContent = 'Preparing secure payment…'; note.textContent = 'UPI, cards or netbanking, secured by Razorpay.' }
   let answered = false;
-  for (let i = 0; i < 30; i++) {
+  for (let i = 0; i < 60; i++) {
     let res, r;
     try { res = await fetch(`${CONFIG.SCRIPT_URL}?pay=${encodeURIComponent(id)}&t=${t}${untilPaid ? '&check=1' : ''}`, {cache: 'no-store', credentials: 'omit'}) }
     catch {                                                         // offline for a moment: try again; but an
-      if (!answered && i >= 2 && navigator.onLine) return 'off';    // orders.gs without payments never answers at all
-      await wait(3000); continue;
+      if (!answered && i >= 3 && navigator.onLine) return 'off';    // orders.gs without payments never answers at all
+      await wait(1500); continue;
     }
     try { r = await res.json() } catch { r = {state: 'off'} }       // an older orders.gs without payments
     answered = true;
@@ -1034,7 +1034,7 @@ async function payFlow(id, t, untilPaid){
       note.textContent = 'UPI, cards or netbanking, secured by Razorpay. We’ve also sent this link to your phone by SMS.';
       return 'ready';
     }
-    await wait(3000);
+    await wait(1500);
   }
   if (!untilPaid) { btn.hidden = true; note.textContent = 'Your secure payment link is on its way to your phone by SMS (and email, if you gave one).' }
   return 'slow';
