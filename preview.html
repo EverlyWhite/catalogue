@@ -493,7 +493,7 @@ form.f{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
   </div>
   <ol class="steps" id="steps" aria-label="What happens next">
     <li class="ok"><i></i><b>Order received</b><small>Saved with us</small></li>
-    <li class="now"><i></i><b id="payStep">QR on WhatsApp</b><small id="payStepNote">For the full payment</small></li>
+    <li class="now"><i></i><b id="payStep">Pay securely</b><small id="payStepNote">By Razorpay</small></li>
     <li><i></i><b>Made by hand</b><small>Once payment is in</small></li>
     <li><i></i><b>Ready for delivery</b><small>On its way to you soon</small></li>
   </ol>
@@ -980,7 +980,7 @@ async function send(e){
     items: slip.map(invoiceLine),
   };
   store.set('ew-outbox', [...outbox(), req]);
-  store.set('ew-pay', {id: req.id, t: token, m: !!(f.email || '').trim()});
+  store.set('ew-pay', {id: req.id, t: token, m: !!(f.email || '').trim(), n: (f.name || '').trim().split(' ')[0].slice(0, 40)});
   track('Purchase', {value: slipTotal(), currency: 'INR', num_items: pieces()});
   $('#send').disabled = true; $('#send').textContent = 'Placing your order…';
   // The order is already saved on this device and goes out in the background (and again later if it must),
@@ -1062,16 +1062,23 @@ function paidView(id, first, mailed){
   $('#pay').hidden = true;
 }
 async function backFromRazorpay(id){
-  const saved = store.get('ew-pay', {});
-  $('#doneTitle').textContent = 'Thank you';
+  const saved = store.get('ew-pay', {}), mine = saved && saved.id === id, first = mine && typeof saved.n === 'string' ? saved.n : '';
+  $('#doneTitle').textContent = 'Thank you' + (first ? ', ' + first : '');
   $('#doneState').textContent = 'Confirming payment';
   $('.seal').setAttribute('hidden', '');
-  $('#doneMsg').innerHTML = `We’re confirming the payment for your order <b>${esc(id)}</b> with Razorpay…`;
+  $('#doneMsg').innerHTML = `We’re confirming the payment for your order <b>${esc(id)}</b> with Razorpay. This takes a few seconds.`;
+  // the progress bar of this flow: order received ✓, payment being confirmed, then made by hand, then delivery
+  const li = $('#steps').children; li[0].className = 'ok'; li[1].className = 'now'; li[2].className = ''; li[3].className = '';
+  $('#payStep').textContent = 'Pay securely'; $('#payStepNote').textContent = 'Confirming…';
+  $('#explore').classList.add('ghost'); $('#explore').textContent = 'Continue browsing';
   $('#pay').hidden = true; $('.ordered').hidden = true; $('#steps').classList.remove('paid');
   $('#done').classList.add('on'); $('#done').scrollTop = 0;
   const state = saved && saved.id === id && /^[a-f0-9]{32}$/.test(saved.t) ? await payFlow(id, saved.t, true) : 'unknown';
-  if (state === 'paid') { paidView(id, '', !!saved.m); confetti() }
-  else $('#doneMsg').innerHTML = `Thank you! Razorpay will send your receipt for order <b>${esc(id)}</b>, and we’ll confirm on WhatsApp shortly.`;
+  if (state === 'paid') { paidView(id, first, !!saved.m); confetti() }
+  else {
+    $('#doneMsg').innerHTML = `Thank you! We’re still confirming the payment for order <b>${esc(id)}</b>. Once it’s confirmed, we’ll email your invoice and message you on WhatsApp.`;
+    $('#payStepNote').textContent = 'Being confirmed';
+  }
 }
 if (PAID && CONFIG.PAY && CONFIG.SCRIPT_URL) backFromRazorpay(PAID);
 // One card per piece, swipeable, each with its own photo (a candle in the colour chosen, a pair as photographed).
